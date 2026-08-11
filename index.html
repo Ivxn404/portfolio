@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Abhranil Sarkar — Signals, Physiology, and the Systems Between</title>
+<meta name="description" content="Abhranil Sarkar — Electronics and Biomedical Engineering researcher. Embedded systems, biomedical signal processing, neuro-engineering. Project Trainee, ISRO Human Space Flight Centre.">
+<meta name="theme-color" content="#F2EEE7">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2EEE7;
+  --paper-2:#E9E3D7;
+  --paper-3:#DFD8C9;
+  --ink:#17140F;
+  --ink-2:#4C4437;
+  --ink-3:#8B8071;
+  --accent:#BF3B22;
+  --line:#D6CDBD;
+  --serif:'Instrument Serif',ui-serif,Georgia,serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --pad:6vw;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-weight:300;font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:var(--paper)}
+
+/* ---------- grain ---------- */
+.grain{
+  position:fixed;inset:-120%;z-index:9998;pointer-events:none;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 8s steps(6) infinite;
+}
+@keyframes grain{
+  0%,100%{transform:translate(0,0)} 16%{transform:translate(-3%,-2%)}
+  33%{transform:translate(2%,-4%)} 50%{transform:translate(-2%,3%)}
+  66%{transform:translate(3%,2%)} 83%{transform:translate(-4%,-1%)}
+}
+
+/* ---------- cursor ---------- */
+.cur,.cur-ring{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;border-radius:50%;
+  mix-blend-mode:difference;opacity:0;transition:opacity .3s}
+.cur{width:7px;height:7px;background:#fff;margin:-3.5px 0 0 -3.5px}
+.cur-ring{width:40px;height:40px;border:1px solid #fff;margin:-20px 0 0 -20px;
+  transition:width .3s var(--ease),height .3s var(--ease),margin .3s var(--ease),
+             background .3s,opacity .3s}
+body.cur-on .cur,body.cur-on .cur-ring{opacity:1}
+body.cur-hover .cur-ring{width:74px;height:74px;margin:-37px 0 0 -37px;background:rgba(255,255,255,.12)}
+body.cur-hover .cur{opacity:0}
+
+/* ---------- micro type ---------- */
+.micro{
+  font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;font-weight:400;
+  color:var(--ink-3);
+}
+.micro-ink{color:var(--ink-2)}
+.acc{color:var(--accent)}
+.serif{font-family:var(--serif);font-weight:400}
+i,em{font-family:var(--serif);font-style:italic}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px var(--pad);
+  transition:transform .45s var(--ease),color .4s;
+}
+.topbar.hide{transform:translateY(-110%)}
+.topbar.on-dark{color:var(--paper)}
+.topbar.on-dark .micro{color:#a9a08e}
+.topbar .nm{font-family:var(--serif);font-size:1.05rem;letter-spacing:.01em}
+.topnav{display:flex;gap:30px}
+.topnav a{position:relative}
+.topnav a::after{content:'';position:absolute;left:0;bottom:-3px;height:1px;width:0;
+  background:var(--accent);transition:width .35s var(--ease)}
+.topnav a:hover::after{width:100%}
+.topnav a:hover{color:var(--accent)}
+
+/* ---------- hero ---------- */
+.hero{
+  min-height:100vh;min-height:100svh;padding:118px var(--pad) 0;
+  display:flex;flex-direction:column;justify-content:space-between;position:relative;
+}
+.hero-top{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;
+  border-bottom:1px solid var(--line);padding-bottom:16px}
+.hero-mid{padding:clamp(28px,6vh,72px) 0;flex:1;display:flex;flex-direction:column;justify-content:center}
+.bigname{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(3.6rem,15.5vw,15rem);line-height:.86;letter-spacing:-.025em;
+}
+.bigname .ln{display:block;overflow:hidden}
+.bigname .ln>span{display:block;transform:translateY(105%);
+  transition:transform 1.15s var(--ease)}
+.loaded .bigname .ln>span{transform:none}
+.bigname .ln:nth-child(2)>span{transition-delay:.11s}
+.bigname .idx{
+  font-size:.13em;vertical-align:super;letter-spacing:.1em;color:var(--accent);
+  font-family:var(--sans);font-weight:400;
+}
+.hero-sub{
+  display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;
+  margin-top:clamp(26px,5vh,54px);
+  opacity:0;transform:translateY(16px);transition:opacity .9s .5s var(--ease),transform .9s .5s var(--ease);
+}
+.loaded .hero-sub{opacity:1;transform:none}
+.hero-state{font-family:var(--serif);font-size:clamp(1.3rem,3.1vw,2.15rem);line-height:1.22;max-width:17ch}
+.hero-right{text-align:right;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
+.hero-right .val{font-family:var(--serif);font-size:1.15rem}
+.scrollcue{
+  display:flex;align-items:center;gap:11px;padding:18px 0 22px;
+  opacity:0;transition:opacity .9s .8s;
+}
+.loaded .scrollcue{opacity:1}
+.scrollcue .bar{width:1px;height:34px;background:var(--line);position:relative;overflow:hidden}
+.scrollcue .bar::after{content:'';position:absolute;inset:0;background:var(--accent);
+  animation:drop 2.1s var(--ease) infinite}
+@keyframes drop{0%{transform:translateY(-100%)}55%,100%{transform:translateY(100%)}}
+
+/* ---------- marquee ---------- */
+.marq{
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:16px 0;overflow:hidden;white-space:nowrap;background:var(--paper);
+}
+.marq-in{display:inline-flex;animation:slide 34s linear infinite;will-change:transform}
+.marq:hover .marq-in{animation-play-state:paused}
+.marq span{
+  font-family:var(--serif);font-size:clamp(1.15rem,2.4vw,1.9rem);
+  padding:0 30px;display:inline-flex;align-items:center;gap:30px;
+}
+.marq span::after{content:'✳';font-size:.5em;color:var(--accent);font-family:var(--sans)}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+/* ---------- affiliations band ---------- */
+.affil{padding:clamp(44px,7vh,78px) var(--pad);border-bottom:1px solid var(--line)}
+.affil-row{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:clamp(24px,4vw,54px);margin-top:30px;
+}
+.affil-item{padding-top:20px;border-top:1px solid var(--line);position:relative}
+.affil-item::after{content:'';position:absolute;left:0;top:-1px;height:2px;width:0;
+  background:var(--accent);transition:width .55s var(--ease)}
+.affil-item:hover::after{width:100%}
+.am{display:block;font-family:var(--serif);font-size:clamp(1.75rem,4.4vw,3.05rem);
+  line-height:.98;letter-spacing:-.028em}
+.as{display:block;margin-top:11px;font-size:.68rem;letter-spacing:.19em;
+  text-transform:uppercase;color:var(--ink-3);line-height:1.7}
+
+/* ---------- sections ---------- */
+section{padding:clamp(78px,12vh,150px) var(--pad)}
+.lbl{
+  display:flex;align-items:baseline;gap:14px;margin-bottom:44px;
+}
+.lbl::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .95s var(--ease),transform .95s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rw{display:inline-block;overflow:hidden;vertical-align:top}
+.rw>i,.rw>b{display:inline-block;font-style:inherit;font-weight:inherit;
+  transform:translateY(102%);transition:transform .85s var(--ease)}
+.in .rw>i,.in .rw>b{transform:none}
+
+/* ---------- about ---------- */
+.about-grid{display:grid;grid-template-columns:minmax(140px,.9fr) 3.1fr;gap:clamp(28px,6vw,90px);align-items:start}
+.about-stick{position:sticky;top:104px}
+.stmt{
+  font-family:var(--serif);font-size:clamp(1.65rem,4.1vw,3.05rem);line-height:1.16;
+  letter-spacing:-.012em;margin-bottom:52px;
+}
+.stmt em{color:var(--accent)}
+.about-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:34px}
+.about-cols p{color:var(--ink-2);font-size:1rem;line-height:1.72}
+.about-cols p+p{margin-top:15px}
+.about-cols strong{font-weight:500;color:var(--ink)}
+.facts{margin-top:60px;border-top:1px solid var(--line)}
+.fact{display:grid;grid-template-columns:minmax(90px,.5fr) 2fr auto;gap:20px;
+  padding:19px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.fact .f-deg{font-family:var(--serif);font-size:1.22rem;line-height:1.3}
+.fact .f-inst{color:var(--ink-2);font-size:.92rem}
+.fact .f-val{font-family:var(--serif);font-size:1.22rem;color:var(--accent);white-space:nowrap}
+
+/* ---------- research direction ---------- */
+.threads{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));
+  gap:clamp(30px,4vw,52px);margin-top:clamp(44px,6vh,70px)}
+.thread{border-top:1px solid var(--ink);padding-top:22px}
+.t-n{display:block;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:14px}
+.thread h3{font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.35rem,2.5vw,1.85rem);line-height:1.16;letter-spacing:-.015em;margin-bottom:14px}
+.thread p{color:var(--ink-2);font-size:.93rem;line-height:1.68}
+.t-q{
+  display:block;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);
+  font-family:var(--serif);font-style:italic;font-size:1.02rem;line-height:1.44;color:var(--ink);
+}
+.seeking{
+  margin-top:clamp(52px,8vh,90px);padding-top:26px;border-top:1px solid var(--ink);
+  display:flex;justify-content:space-between;gap:26px;flex-wrap:wrap;align-items:baseline;
+}
+.seeking .s-v{font-family:var(--serif);font-size:clamp(1.25rem,2.9vw,2rem);
+  line-height:1.2;letter-spacing:-.015em;max-width:34ch}
+.seeking .s-v em{color:var(--accent)}
+
+/* ---------- experience ---------- */
+.xp{border-top:1px solid var(--line)}
+.xrow{border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.xrow::before{content:'';position:absolute;inset:0;background:var(--paper-2);
+  transform:scaleY(0);transform-origin:bottom;transition:transform .5s var(--ease);z-index:0}
+.xrow:hover::before{transform:scaleY(1);transform-origin:top}
+.xhead{position:relative;z-index:1;display:grid;
+  grid-template-columns:auto 1fr auto auto;gap:clamp(16px,3vw,44px);
+  align-items:start;padding:38px 0 34px;cursor:pointer;
+  transition:padding-left .5s var(--ease)}
+.xrow:hover .xhead{padding-left:20px}
+.xhead>.xnum,.xhead>.xdate{padding-top:.5em}
+.xnum{font-family:var(--serif);font-size:.95rem;color:var(--accent);min-width:26px}
+/* institution leads the hierarchy */
+.xorg-big{
+  display:block;font-family:var(--serif);font-weight:400;
+  font-size:clamp(2.05rem,6.1vw,4.35rem);line-height:.94;letter-spacing:-.028em;
+  transition:color .4s var(--ease);
+}
+.xrow:hover .xorg-big{color:var(--accent)}
+.xorg-full{
+  display:block;margin-top:11px;font-size:.72rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.xrole{
+  display:block;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+  font-family:var(--serif);font-size:clamp(1.05rem,2.1vw,1.45rem);
+  line-height:1.25;color:var(--ink);max-width:46ch;
+}
+.xplace{display:block;margin-top:6px;color:var(--ink-2);font-size:.88rem;max-width:62ch}
+.xdate{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.xnow{display:inline-flex;align-items:center;gap:7px;color:var(--accent)}
+.xnow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);
+  animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
+.xbody{position:relative;z-index:1;max-height:0;overflow:hidden;
+  transition:max-height .65s var(--ease)}
+.xrow.open .xbody{max-height:1000px}
+.xbody-in{padding:0 0 32px clamp(0px,3vw,44px);display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px 44px;max-width:1100px}
+.xbody-in p{color:var(--ink-2);font-size:.94rem;line-height:1.66;
+  padding-left:18px;position:relative}
+.xbody-in p::before{content:'';position:absolute;left:0;top:.66em;width:8px;height:1px;background:var(--accent)}
+.xtoggle{position:relative;z-index:1;width:15px;height:15px;flex:none;align-self:center}
+.xtoggle::before,.xtoggle::after{content:'';position:absolute;background:var(--ink);
+  transition:transform .45s var(--ease),background .3s}
+.xtoggle::before{top:7px;left:0;width:15px;height:1px}
+.xtoggle::after{left:7px;top:0;width:1px;height:15px}
+.xrow.open .xtoggle::after{transform:rotate(90deg)}
+.xrow.open .xtoggle::before{background:var(--accent)}
+
+/* ---------- horizontal work ---------- */
+.work-intro{padding-bottom:0}
+.hwrap{position:relative;padding:0}
+.hstick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:flex;align-items:center}
+.htrack{display:flex;align-items:stretch;gap:26px;padding:0 var(--pad);will-change:transform}
+.panel{
+  width:clamp(300px,46vw,560px);flex:none;
+  border-top:1px solid var(--ink);padding-top:24px;
+  display:flex;flex-direction:column;
+}
+.p-top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:20px}
+.p-num{font-family:var(--serif);font-size:clamp(2.6rem,5.4vw,4.4rem);line-height:.8;letter-spacing:-.03em}
+.p-num sup{font-size:.17em;vertical-align:super;color:var(--accent);letter-spacing:.14em;
+  font-family:var(--sans);font-weight:400;margin-left:5px}
+.p-title{font-family:var(--serif);font-size:clamp(1.35rem,2.6vw,2rem);line-height:1.14;
+  letter-spacing:-.012em;margin-bottom:18px;max-width:22ch}
+.p-body{flex:1}
+.p-body p{color:var(--ink-2);font-size:.9rem;line-height:1.62;padding-left:17px;position:relative}
+.p-body p+p{margin-top:9px}
+.p-body p::before{content:'';position:absolute;left:0;top:.68em;width:7px;height:1px;background:var(--accent)}
+.p-tags{margin:22px 0 18px;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink-3);line-height:1.9}
+.p-tags b{font-weight:400}
+.p-tags b+b::before{content:' / ';color:var(--line)}
+.p-link{display:inline-flex;align-items:center;gap:10px;font-size:.72rem;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--ink);align-self:flex-start;padding-bottom:5px;
+  border-bottom:1px solid var(--ink);transition:color .3s,border-color .3s,gap .3s var(--ease)}
+.p-link:hover{color:var(--accent);border-color:var(--accent);gap:17px}
+.p-link span{transition:transform .3s var(--ease)}
+.divider{
+  width:clamp(140px,15vw,200px);flex:none;position:relative;
+  border-top:1px solid transparent;
+}
+.divider .d-in{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%) rotate(-90deg);transform-origin:center;
+  white-space:nowrap;
+  font-family:var(--serif);font-size:clamp(1.1rem,2vw,1.6rem);color:var(--accent);
+  display:flex;align-items:center;gap:14px}
+.divider .d-in::before{content:'';width:44px;height:1px;background:var(--accent)}
+.hprog{position:absolute;left:var(--pad);right:var(--pad);bottom:34px;height:1px;background:var(--line)}
+.hprog i{position:absolute;left:0;top:-1px;height:3px;width:0;background:var(--accent);transition:width .12s linear}
+.hhint{position:absolute;right:var(--pad);bottom:48px;display:flex;align-items:center;gap:10px}
+
+/* ---------- skills ---------- */
+.sk{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:44px 60px}
+.sk-g h3{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);
+  font-weight:400;margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.sk-g p{font-family:var(--serif);font-size:clamp(1.12rem,1.9vw,1.5rem);line-height:1.42;color:var(--ink)}
+.sk-g p span{color:var(--line);padding:0 4px}
+
+/* ---------- lead ---------- */
+.lead{display:grid;grid-template-columns:minmax(140px,.9fr) 3.1fr;gap:clamp(28px,6vw,90px)}
+.lead h3{font-family:var(--serif);font-size:clamp(1.5rem,3.2vw,2.3rem);line-height:1.16;margin-bottom:9px}
+.lead .l-org{color:var(--accent);font-size:.9rem;margin-bottom:26px}
+.lead p.li{color:var(--ink-2);font-size:.97rem;line-height:1.7;padding-left:19px;position:relative;max-width:70ch}
+.lead p.li+p.li{margin-top:12px}
+.lead p.li::before{content:'';position:absolute;left:0;top:.7em;width:9px;height:1px;background:var(--accent)}
+
+/* ---------- contact ---------- */
+.contact{background:var(--ink);color:var(--paper);padding-bottom:clamp(46px,7vh,80px)}
+.contact .micro{color:#9d9382}
+.contact .lbl::after{background:#3a332a}
+.c-big{font-family:var(--serif);font-size:clamp(2.1rem,6.4vw,5.2rem);line-height:1.06;
+  letter-spacing:-.02em;margin-bottom:14px;max-width:16ch}
+.c-big em{color:#E8734F}
+.c-sub{color:#a9a08e;max-width:52ch;margin-bottom:clamp(40px,6vh,70px);font-size:1.02rem}
+.c-mail{
+  display:inline-block;font-family:var(--serif);
+  font-size:clamp(1.3rem,4.4vw,3.1rem);letter-spacing:-.015em;
+  border-bottom:1px solid #4a4237;padding-bottom:8px;
+  transition:color .35s,border-color .35s;word-break:break-word;
+}
+.c-mail:hover{color:#E8734F;border-color:#E8734F}
+.c-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(38px,6vh,64px)}
+.c-links a{
+  font-size:.72rem;letter-spacing:.17em;text-transform:uppercase;
+  border:1px solid #3a332a;border-radius:99px;padding:13px 25px;
+  transition:background .35s var(--ease),color .35s,border-color .35s;
+}
+.c-links a:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  margin-top:clamp(56px,9vh,110px);padding-top:22px;border-top:1px solid #3a332a}
+
+/* ---------- responsive / a11y ---------- */
+@media (hover:none),(pointer:coarse){.cur,.cur-ring{display:none}}
+@media (max-width:900px){
+  :root{--pad:22px}
+  .topnav{display:none}
+  .about-grid,.lead{grid-template-columns:1fr;gap:26px}
+  .about-stick{position:static}
+  .fact{grid-template-columns:1fr auto;gap:6px 16px}
+  .fact .f-inst{grid-column:1/-1;order:3}
+  .xhead{grid-template-columns:auto 1fr;row-gap:9px}
+  .xdate{grid-column:2}
+  .xtoggle{display:none}
+  .xrow .xbody{max-height:none}
+  .xbody-in{padding-left:0;padding-bottom:26px}
+  .hwrap{height:auto!important;padding:0 var(--pad)}
+  .hstick{position:static;height:auto;overflow:visible;display:block}
+  .htrack{flex-direction:column;gap:52px;padding:0;transform:none!important}
+  .panel{width:100%}
+  .divider{width:100%;padding-top:12px;height:auto}
+  .divider .d-in{position:static;transform:none}
+  .hprog,.hhint{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}
+  .rv{opacity:1;transform:none}
+  .rw>i,.rw>b{transform:none}
+  .bigname .ln>span{transform:none}
+  .hero-sub,.scrollcue{opacity:1;transform:none}
+  .grain{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="cur" aria-hidden="true"></div>
+<div class="cur-ring" aria-hidden="true"></div>
+
+<div class="topbar" id="topbar">
+  <a href="#top" class="nm">Abhranil Sarkar</a>
+  <nav class="topnav micro">
+    <a href="#about">About</a>
+    <a href="#research">Research</a>
+    <a href="#experience">Experience</a>
+    <a href="#work">Projects</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-top micro">
+    <span>Electronics &amp; Biomedical Engineering</span>
+    <span>Portfolio — MMXXVI</span>
+  </div>
+
+  <div class="hero-mid">
+    <h1 class="bigname">
+      <span class="ln"><span>Abhranil</span></span>
+      <span class="ln"><span>Sarkar<sup class="idx">01</sup></span></span>
+    </h1>
+
+    <div class="hero-sub">
+      <p class="hero-state">Signals, physiology, and the <em>systems between them.</em></p>
+      <div class="hero-right">
+        <span class="micro">Currently</span>
+        <span class="val">ISRO — Human Space Flight Centre</span>
+        <span class="micro">Human Digital Twin · BMED, Bengaluru</span>
+        <span class="micro" style="margin-top:14px;color:var(--accent)">Seeking direct PhD — Fall 2027</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scrollcue">
+    <span class="bar"></span>
+    <span class="micro">Scroll</span>
+  </div>
+</header>
+
+<div class="marq" aria-hidden="true">
+  <div class="marq-in">
+    <span>Neuro-Engineering</span><span>Biomedical Optics</span><span>Embedded Systems</span>
+    <span>Signal Processing</span><span>Edge AI</span><span>Instrumentation</span>
+    <span>Neuro-Engineering</span><span>Biomedical Optics</span><span>Embedded Systems</span>
+    <span>Signal Processing</span><span>Edge AI</span><span>Instrumentation</span>
+  </div>
+</div>
+
+<!-- ============ AFFILIATIONS ============ -->
+<div class="affil rv">
+  <span class="micro">Research affiliations</span>
+  <div class="affil-row">
+    <div class="affil-item">
+      <span class="am">ISRO</span>
+      <span class="as">Human Space Flight Centre<br>Biomedical Engineering Division</span>
+    </div>
+    <div class="affil-item">
+      <span class="am">CSIR&#8203;-CMERI</span>
+      <span class="as">Central Mechanical Engineering<br>Research Institute, Durgapur</span>
+    </div>
+    <div class="affil-item">
+      <span class="am">VIT</span>
+      <span class="as">Vellore Institute of Technology<br>B.Tech ECE — Biomedical</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-stick">
+      <div class="lbl"><span class="micro">Ⅰ — About</span></div>
+    </div>
+    <div>
+      <p class="stmt rv" data-split>I build the instruments that listen to the body — and the models that <em>understand what they hear.</em></p>
+
+      <div class="about-cols rv">
+        <div>
+          <p>I'm an Electronics &amp; Communication Engineering student at <strong>VIT Vellore</strong>, specialising in Biomedical Engineering. My work sits on the boundary between embedded hardware and computational neuroscience: designing the sensing circuit, writing the real-time conditioning, and building the model that turns a raw waveform into something a clinician — or a flight surgeon — can act on.</p>
+          <p>At <strong>ISRO's Human Space Flight Centre</strong> I develop cross-modal deep learning frameworks for EEG and ECG telemetry, reconstructing and classifying physiological signals for astronaut fatigue and anomaly detection.</p>
+        </div>
+        <div>
+          <p>Earlier work at <strong>CSIR-CMERI</strong> covered analog sensor instrumentation for assistive robotics and CNN-based histopathology classification, and an industrial placement took me into vibration monitoring and PCB design for CNC spindle diagnostics.</p>
+          <p>My research interests centre on <strong>neuro-engineering, diffuse optical tomography, and edge-deployable biomedical AI</strong> — particularly systems that stay reliable outside the lab, in resource-limited or high-stakes environments.</p>
+        </div>
+      </div>
+
+      <div class="facts rv">
+        <div class="fact">
+          <span class="micro micro-ink">2023 — Now</span>
+          <span><span class="f-deg">B.Tech, Electronics &amp; Communication</span><br><span class="f-inst">Biomedical Engineering specialisation · Vellore Institute of Technology</span></span>
+          <span class="f-val">8.14</span>
+        </div>
+        <div class="fact">
+          <span class="micro micro-ink">2021 — 2023</span>
+          <span><span class="f-deg">Class XII</span><br><span class="f-inst">Hem Sheela Model School</span></span>
+          <span class="f-val">90%</span>
+        </div>
+        <div class="fact">
+          <span class="micro micro-ink">2010 — 2021</span>
+          <span><span class="f-deg">Class X</span><br><span class="f-inst">St. Xavier's School</span></span>
+          <span class="f-val">94%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESEARCH DIRECTION ============ -->
+<section id="research">
+  <div class="lbl"><span class="micro">Ⅱ — Research direction</span><span class="micro">Doctoral intent</span></div>
+
+  <p class="stmt rv" data-split style="max-width:26ch">I want to build the instruments that read brain state — and the inference layer that <em>makes them mean something.</em></p>
+
+  <div class="about-cols rv" style="max-width:82ch">
+    <div>
+      <p>My trajectory has been from <strong>biomedical engineer toward neuroscientist</strong>: I started at the circuit — stretch sensors, accelerometers, embedded FFT on an STM32 — and moved steadily up the stack toward the question of what a physiological signal actually tells you about the system producing it.</p>
+    </div>
+    <div>
+      <p>A direct PhD is the right vehicle because the problems I care about don't separate cleanly into hardware and analysis. A photon transport model is only as useful as the probe geometry it assumes; a seizure classifier is only as useful as the wearable it can run on. I want to work across that whole span.</p>
+    </div>
+  </div>
+
+  <div class="threads">
+    <div class="thread rv">
+      <span class="t-n">Thread 01</span>
+      <h3>Multimodal neural decoding</h3>
+      <p>Cross-modal reconstruction between EEG and ECG, and Transformer-based classification of physiological anomaly — currently applied to astronaut fatigue telemetry and a Human Digital Twin programme at ISRO.</p>
+      <span class="t-q">How much of one modality's information is latent in another — and what does shared structure reveal about underlying physiological state?</span>
+    </div>
+    <div class="thread rv">
+      <span class="t-n">Thread 02</span>
+      <h3>Non-invasive optical neuroimaging</h3>
+      <p>Finite-element forward modelling of near-infrared photon diffusion in cortical tissue, validated against Monte Carlo, and whole-body NIR transport simulation across heterogeneous anatomy.</p>
+      <span class="t-q">How far can diffuse optics be pushed toward reliable cortical readout outside a controlled lab environment?</span>
+    </div>
+    <div class="thread rv">
+      <span class="t-n">Thread 03</span>
+      <h3>Edge-deployable biomedical inference</h3>
+      <p>Real-time embedded DSP, 1D-CNN seizure detection built for ambulatory monitoring, and wearable tremor sensing — models constrained by what a microcontroller on a person's body can actually sustain.</p>
+      <span class="t-q">What survives the move from GPU to embedded target, and what does that constraint teach us about the signal?</span>
+    </div>
+  </div>
+
+  <div class="seeking rv">
+    <span class="s-v">Seeking a <em>direct PhD</em> for Fall 2027 in computational neuroscience or biomedical signal processing.</span>
+    <span class="micro">Open to enquiries — <a href="#contact" style="border-bottom:1px solid var(--line)">get in touch</a></span>
+  </div>
+</section>
+
+<!-- ============ EXPERIENCE ============ -->
+<section id="experience">
+  <div class="lbl"><span class="micro">Ⅲ — Experience</span><span class="micro">Select to expand</span></div>
+
+  <div class="xp">
+    <article class="xrow open rv">
+      <div class="xhead" role="button" tabindex="0" aria-expanded="true">
+        <span class="xnum">01</span>
+        <span>
+          <span class="xorg-big">ISRO</span>
+          <span class="xorg-full">Indian Space Research Organisation</span>
+          <span class="xrole">Project Trainee &amp; Research Intern</span>
+          <span class="xplace">Human Space Flight Centre (HSFC) · Biomedical Engineering Division · Bengaluru</span>
+        </span>
+        <span class="xdate"><span class="xnow">May 2026 — Present</span></span>
+        <span class="xtoggle"></span>
+      </div>
+      <div class="xbody"><div class="xbody-in">
+        <p>Fast-tracked onto the divisional <strong>Human Digital Twin</strong> mega-project in BMED following a standalone implementation of a high-performance signal processing framework during an on-site internship at the Astronaut Training Facility.</p>
+        <p>Processed raw signal files containing 5,000+ biological waveform segments; designed a high-frequency filtering engine harmonising multimodal telemetry with processing bounds up to 45 Hz.</p>
+        <p>Engineered cross-modal networks reaching &gt;99% signal tracking accuracy; pioneered diagnostic Transformer classification mapping compressed global token matrices to 10 distinct anomaly classes.</p>
+        <p>Collaborating with staff scientists to scale and integrate technical workflows into official divisional systems using Python/MATLAB architectures for multi-dimensional datasets.</p>
+        <p>Maintained training loop convergence under extreme dataset variance, reducing initial loss by over 35%.</p>
+      </div></div>
+    </article>
+
+    <article class="xrow rv">
+      <div class="xhead" role="button" tabindex="0" aria-expanded="false">
+        <span class="xnum">02</span>
+        <span>
+          <span class="xorg-big">North Technoprojects</span>
+          <span class="xorg-full">India Pvt. Ltd.</span>
+          <span class="xrole">Hardware &amp; Embedded Systems Intern</span>
+          <span class="xplace">Industrial instrumentation &amp; CNC diagnostics · West Bengal</span>
+        </span>
+        <span class="xdate">Jun — Jul 2025</span>
+        <span class="xtoggle"></span>
+      </div>
+      <div class="xbody"><div class="xbody-in">
+        <p>Designed a real-time vibration monitoring system using an STM32F103C8T6 MCU and ADXL345 3-axis accelerometer, sampling at 3200 Hz for spindle wear detection in industrial CNC machines.</p>
+        <p>Developed a 256-point embedded FFT in C++ for real-time frequency-domain analysis, achieving 98% fault detection accuracy and reducing unexpected breakdowns by 18%.</p>
+        <p>Engineered a compact 2-layer KiCad PCB with 40% footprint reduction; implemented RS485 Modbus SCADA integration with &lt;120 ms latency for industrial IoT connectivity.</p>
+      </div></div>
+    </article>
+
+    <article class="xrow rv">
+      <div class="xhead" role="button" tabindex="0" aria-expanded="false">
+        <span class="xnum">03</span>
+        <span>
+          <span class="xorg-big">CSIR&#8203;-CMERI</span>
+          <span class="xorg-full">Council of Scientific &amp; Industrial Research</span>
+          <span class="xrole">Research Intern</span>
+          <span class="xplace">Central Mechanical Engineering Research Institute · Mechatronics Dept. · Durgapur</span>
+        </span>
+        <span class="xdate">May — Jun 2025</span>
+        <span class="xtoggle"></span>
+      </div>
+      <div class="xbody"><div class="xbody-in">
+        <p>Engineered and calibrated 16+ analog stretch sensor circuits for a full hand using voltage divider networks and Arduino Uno boards to quantify grasp strength in a micro-motor feedback system, matching reference curves within ±0.02 V.</p>
+        <p>Programmed voltage-to-resistance conversion algorithms in embedded C to classify hand gestures (open, semi-flexed, clenched), achieving 97.8% recognition accuracy across calibrated units.</p>
+        <p>Designed and trained a custom CNN for multi-class cancer classification across 6 tissue types — 97.3% accuracy, 97.1% precision, 97.6% F1 on unseen biopsy images.</p>
+        <p>Applied transfer learning and dynamic augmentation to counter class imbalance, improving minority-class prediction by 13.5% over baseline.</p>
+      </div></div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ WORK (horizontal) ============ -->
+<section class="work-intro" id="work">
+  <div class="lbl"><span class="micro">Ⅳ — Selected projects</span><span class="micro">Nine works</span></div>
+  <p class="stmt rv" data-split style="max-width:20ch;margin-bottom:0">Nine investigations in <em>signal, tissue &amp; inference.</em></p>
+</section>
+
+<div class="hwrap" id="hwrap">
+  <div class="hstick">
+    <div class="htrack" id="htrack">
+
+      <div class="divider"><div class="d-in">Ⅰ &nbsp;Neuro-Engineering</div></div>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">01<sup>ISRO</sup></span></div>
+        <h3 class="p-title">Cross-Modal Reconstruction of EEG &amp; ECG for Predictive Fatigue Classification</h3>
+        <div class="p-body">
+          <p>Processed 5,000+ biological waveform segments from large telemetry pools at ISRO HSFC.</p>
+          <p>Built a high-frequency filtering engine harmonising multimodal telemetry up to 45 Hz.</p>
+          <p>Cross-modal networks achieving &gt;99% signal tracking accuracy for waveform synthesis.</p>
+          <p>Transformer-based diagnostic classification across 10 anomaly classes; 35%+ loss reduction.</p>
+        </div>
+        <div class="p-tags"><b>Transformers</b><b>Multimodal DSP</b><b>Python</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/1rihL5mj62eKVIuGT3_Oed1usPHnq4piZ/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">02</span></div>
+        <h3 class="p-title">Neurological Intelligence System — Automated Epileptic Seizure Detection</h3>
+        <div class="p-body">
+          <p>1D-CNN and spectrogram analysis reaching 97.6% classification accuracy in real-time seizure detection.</p>
+          <p>Integrated temporal feature extraction with frequency-domain dimensionality reduction (PCA).</p>
+          <p>Edge-ready design for continuous ambulatory EEG monitoring and rapid clinical intervention.</p>
+        </div>
+        <div class="p-tags"><b>1D-CNN</b><b>EEG</b><b>PCA</b><b>Spectrograms</b></div>
+        <a class="p-link" href="https://docs.google.com/presentation/d/1A-0nxe9CPnzMxAreufKa9h3hWmGErUqH/edit?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">03</span></div>
+        <h3 class="p-title">FEM Forward Modeling of Near-Infrared Photon Diffusion in Cortical Tissue</h3>
+        <div class="p-body">
+          <p>Finite-element photon transport model in NIRFAST at 800 nm — 1,236 nodes, 2,352 triangular elements.</p>
+          <p>Continuous-wave diffusion solves with gray-matter-matched optical parameters; &lt;0.5% variance across mesh refinements.</p>
+          <p>&gt;99.3% agreement with Monte Carlo simulation, max local error &lt;1.2%, R = 0.996 across detector fluence outputs.</p>
+          <p>Source–detector geometry enabling Jacobian sensitivity analysis at sub-3 mm spatial resolution.</p>
+        </div>
+        <div class="p-tags"><b>NIRFAST</b><b>MATLAB</b><b>FEM</b><b>DOT / fNIRS</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/1XSWtFB-35O8iuJaXegKkr7bsq7ZeTK7X/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">04</span></div>
+        <h3 class="p-title">Elliptical Whole-Body NIR Light Transport Simulator</h3>
+        <div class="p-body">
+          <p>MATLAB framework modelling whole-body near-infrared light transport through an elliptical five-layer tissue cross-section.</p>
+          <p>Dense triangular mesh with configurable source–detector arrangements for fluence distribution in heterogeneous anatomy.</p>
+          <p>Log-fluence maps and source–detector path profiles supporting multi-wavelength sensitivity analysis.</p>
+        </div>
+        <div class="p-tags"><b>MATLAB</b><b>NIR Transport</b><b>Tissue Modeling</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/1nk0uBj_d0mXQQbLxUGzBKP1kSwnE5zEG/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">05</span></div>
+        <h3 class="p-title">Baseline Classification of Brain MRI Scans via Transfer Learning</h3>
+        <div class="p-body">
+          <p>Processed and classified 500+ brain MRI scans across four tumour categories — glioma, meningioma, pituitary, no-tumour — using a modified ResNet-50.</p>
+          <p>Established an early transfer-learning benchmark for resource-constrained medical diagnostic pipelines.</p>
+        </div>
+        <div class="p-tags"><b>TensorFlow / Keras</b><b>ResNet-50</b><b>Medical Imaging</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/12OUgRMhN3E73th4QbKM2vfqrK74S0Hsy/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <div class="divider"><div class="d-in">Ⅱ &nbsp;Signals &amp; Applied AI</div></div>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">06</span></div>
+        <h3 class="p-title">ECG Arrhythmia Classification on the MIT-BIH Database</h3>
+        <div class="p-body">
+          <p>Built parallel pipelines using classical ML and 1D-CNNs for automated arrhythmia detection.</p>
+          <p>Engineered domain-driven features from ECG morphology and heart-rate variability, benchmarked against end-to-end deep learning on raw segments.</p>
+          <p>Evaluated accuracy, interpretability and compute cost for deployment in wearable and remote-monitoring systems.</p>
+        </div>
+        <div class="p-tags"><b>1D-CNN</b><b>MIT-BIH</b><b>HRV Features</b></div>
+        <a class="p-link" href="https://docs.google.com/document/d/13SwOLHxTE49sPiBNSeam5UE5DKBIkubD9z4AB9Hx7GQ/edit?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">07</span></div>
+        <h3 class="p-title">4th-Generation Non-Enzymatic Salivary Glucose Sensor Using CuO Nanozymes</h3>
+        <div class="p-body">
+          <p>Developed a shelf-stable abiotic biosensor using copper-oxide nanozymes and a 3D cellulose architecture for decentralised salivary glucose monitoring.</p>
+          <p>Eliminated thermal instability and cold-chain requirements, achieving 98% signal retention over 30 days.</p>
+          <p>Cost-effective, durable platform designed for resource-limited diagnostic settings.</p>
+        </div>
+        <div class="p-tags"><b>CuO Nanozymes</b><b>Biosensors</b><b>Nanotechnology</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/1muOpAmvC258dXyBV1cUSXz_NjiaC1USF/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">08</span></div>
+        <h3 class="p-title">Client-Side Neural Network Training &amp; Inference Lab</h3>
+        <div class="p-body">
+          <p>Single-page web application for in-browser dataset labelling, network construction and real-time hyperparameter tuning.</p>
+          <p>Training and inference executed entirely client-side via WebGL/WebGPU acceleration — no server dependency.</p>
+          <p>Fully client-side model serialisation, advancing federated-learning and edge-AI workflows.</p>
+        </div>
+        <div class="p-tags"><b>TensorFlow.js</b><b>WebGL / WebGPU</b><b>Edge AI</b></div>
+        <a class="p-link" href="https://github.com/lvxn404/deepl-mt" target="_blank" rel="noopener">View on GitHub <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">09</span></div>
+        <h3 class="p-title">Wearable Hand Tremor Detection System</h3>
+        <div class="p-body">
+          <p>Low-cost wearable biomedical device for real-time detection and classification of hand tremors toward early-stage Parkinson's screening.</p>
+          <p>Integrated MPU6050 accelerometer/gyroscope with adaptive threshold-based tremor filtering algorithms.</p>
+        </div>
+        <div class="p-tags"><b>MPU6050</b><b>Arduino</b><b>Signal Filtering</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/1EGvJHr2vHYkmI6chr-whrpI4SPSempxX/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+    </div>
+    <div class="hhint"><span class="micro">Scroll to advance</span></div>
+    <div class="hprog"><i id="hprog"></i></div>
+  </div>
+</div>
+
+<!-- ============ SKILLS ============ -->
+<section id="skills">
+  <div class="lbl"><span class="micro">Ⅴ — Capabilities</span></div>
+  <div class="sk">
+    <div class="sk-g rv"><h3>Core</h3><p>Embedded Systems <span>/</span> Signal Processing <span>/</span> Biomedical Device Development <span>/</span> Hardware Design <span>/</span> Real-Time Systems</p></div>
+    <div class="sk-g rv"><h3>Languages</h3><p>C <span>/</span> C++ <span>/</span> Python <span>/</span> MATLAB <span>/</span> Verilog <span>/</span> ARM Assembly <span>/</span> JavaScript <span>/</span> Java</p></div>
+    <div class="sk-g rv"><h3>Hardware</h3><p>STM32 <span>/</span> Arduino <span>/</span> ADXL345 <span>/</span> MLX90614 <span>/</span> MPU6050 <span>/</span> KiCad <span>/</span> SCADA <span>/</span> RS485 Modbus <span>/</span> I²C · SPI</p></div>
+    <div class="sk-g rv"><h3>DSP</h3><p>FFT Algorithms <span>/</span> Real-Time Conditioning <span>/</span> Sensor Integration <span>/</span> Noise Filtering <span>/</span> Digital Communication</p></div>
+    <div class="sk-g rv"><h3>Platforms</h3><p>TensorFlow <span>/</span> MATLAB <span>/</span> GitHub <span>/</span> VS Code <span>/</span> Azure DevOps <span>/</span> AWS <span>/</span> GCP</p></div>
+    <div class="sk-g rv"><h3>Domains</h3><p>Biomedical Instrumentation <span>/</span> Medical Imaging <span>/</span> Wearable Design <span>/</span> IoT Integration <span>/</span> Industrial Automation</p></div>
+  </div>
+</section>
+
+<!-- ============ LEADERSHIP ============ -->
+<section id="leadership">
+  <div class="lead">
+    <div><div class="lbl"><span class="micro">Ⅵ — Beyond the lab</span></div></div>
+    <div class="rv">
+      <h3>Events &amp; Operations Head</h3>
+      <div class="l-org">Institution's Innovation Council (IIC), VIT Vellore &nbsp;·&nbsp; Apr 2024 — Jul 2025</div>
+      <p class="li">Orchestrated Innovation Week 2025 — 17+ events, 2,000+ participants — promoting emerging technology and research initiatives.</p>
+      <p class="li">Organised the Yuvamanthan Finals with leading teams from across India in Startup, Hackathon, Tech Transfer and R&amp;D categories.</p>
+      <p class="li">Led VIT Vellore's delegation to VIT-AP for a national exhibition, earning accolades for the team.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="contact" id="contact">
+  <div class="lbl"><span class="micro">Ⅶ — Contact</span><span class="micro">Fall 2027 intake</span></div>
+  <h2 class="c-big rv" data-split>Seeking a direct PhD in <em>computational neuroscience</em> &amp; biomedical signal processing.</h2>
+  <p class="c-sub rv">Applying for Fall 2027 entry. If your lab works on neural decoding, diffuse optical imaging, or physiological signal modelling — or you supervise in an adjacent area — I'd welcome a conversation.</p>
+  <a class="c-mail" href="mailto:ivansarkar08@gmail.com">ivansarkar08@gmail.com</a>
+  <div class="c-links">
+    <a href="https://www.linkedin.com/in/abhranil-sarkar" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://github.com/lvxn404" target="_blank" rel="noopener">GitHub</a>
+    <a href="tel:+918250596205">+91 82505 96205</a>
+  </div>
+  <div class="foot micro">
+    <span>© MMXXVI Abhranil Sarkar</span>
+    <span>West Bengal, India</span>
+  </div>
+</section>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine   = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+  /* ---- load ---- */
+  window.addEventListener('load', function(){ document.body.classList.add('loaded'); });
+  setTimeout(function(){ document.body.classList.add('loaded'); }, 900);
+
+  /* ---- split headlines into masked words ---- */
+  document.querySelectorAll('[data-split]').forEach(function(el){
+    var html = el.innerHTML;
+    var tmp = document.createElement('div'); tmp.innerHTML = html;
+    function walk(node, out){
+      node.childNodes.forEach(function(n){
+        if(n.nodeType===3){
+          n.textContent.split(/(\s+)/).forEach(function(w){
+            if(!w.trim()){ out.push(document.createTextNode(' ')); return; }
+            var s=document.createElement('span'); s.className='rw';
+            var b=document.createElement('b'); b.textContent=w; s.appendChild(b); out.push(s);
+          });
+        } else if(n.nodeType===1){
+          var clone=n.cloneNode(false); var kids=[]; walk(n,kids);
+          kids.forEach(function(k){clone.appendChild(k)}); out.push(clone);
+        }
+      });
+    }
+    var out=[]; walk(tmp,out);
+    el.innerHTML=''; out.forEach(function(n){el.appendChild(n)});
+    var d=0;
+    el.querySelectorAll('.rw>b,.rw>i').forEach(function(b){
+      b.style.transitionDelay=(d+=0.035).toFixed(3)+'s';
+    });
+  });
+
+  /* ---- reveal ---- */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  /* ---- experience accordion ---- */
+  document.querySelectorAll('.xhead').forEach(function(h){
+    function toggle(){
+      var row=h.closest('.xrow'), open=row.classList.toggle('open');
+      h.setAttribute('aria-expanded', open?'true':'false');
+    }
+    h.addEventListener('click', toggle);
+    h.addEventListener('keydown', function(e){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); }
+    });
+  });
+
+  /* ---- hide topbar on scroll down + invert over dark section ---- */
+  var last=0, bar=document.getElementById('topbar'), dark=document.getElementById('contact');
+  window.addEventListener('scroll', function(){
+    var y=window.scrollY;
+    bar.classList.toggle('hide', y>last && y>420);
+    last=y;
+    if(dark){
+      var r=dark.getBoundingClientRect();
+      bar.classList.toggle('on-dark', r.top<=56 && r.bottom>=0);
+    }
+  }, {passive:true});
+
+  /* ---- horizontal work section ---- */
+  var wrap=document.getElementById('hwrap'),
+      track=document.getElementById('htrack'),
+      prog=document.getElementById('hprog'),
+      travel=0, cur=0, target=0, raf=null;
+
+  function measure(){
+    if(window.innerWidth<=900||reduce){
+      wrap.style.height=''; track.style.transform=''; return;
+    }
+    travel = track.scrollWidth - window.innerWidth;
+    if(travel<0) travel=0;
+    wrap.style.height=(travel + window.innerHeight)+'px';
+  }
+  function onScroll(){
+    if(window.innerWidth<=900||reduce||!travel) return;
+    var top=wrap.getBoundingClientRect().top;
+    var p=Math.min(Math.max(-top/travel,0),1);
+    target=p*travel;
+    if(prog) prog.style.width=(p*100)+'%';
+    if(!raf) raf=requestAnimationFrame(tick);
+  }
+  function tick(){
+    cur += (target-cur)*0.12;
+    if(Math.abs(target-cur)<0.4){ cur=target; raf=null; }
+    else raf=requestAnimationFrame(tick);
+    track.style.transform='translate3d('+(-cur)+'px,0,0)';
+  }
+  measure(); onScroll();
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', function(){ measure(); onScroll(); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ measure(); onScroll(); });
+
+  /* ---- custom cursor ---- */
+  if(fine && !reduce){
+    var dot=document.querySelector('.cur'), ring=document.querySelector('.cur-ring'),
+        mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove', function(e){
+      mx=e.clientX; my=e.clientY;
+      dot.style.transform='translate3d('+mx+'px,'+my+'px,0)';
+      document.body.classList.add('cur-on');
+    });
+    (function loop(){
+      rx+=(mx-rx)*0.16; ry+=(my-ry)*0.16;
+      ring.style.transform='translate3d('+rx+'px,'+ry+'px,0)';
+      requestAnimationFrame(loop);
+    })();
+    document.querySelectorAll('a,button,.xhead,[role="button"]').forEach(function(el){
+      el.addEventListener('mouseenter',function(){document.body.classList.add('cur-hover')});
+      el.addEventListener('mouseleave',function(){document.body.classList.remove('cur-hover')});
+    });
+    document.addEventListener('mouseleave',function(){document.body.classList.remove('cur-on')});
+  }
+})();
+</script>
+</body>
+</html>

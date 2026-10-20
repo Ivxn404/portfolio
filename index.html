@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Abhranil Sarkar — Signals, Physiology, and the Systems Between</title>
-<meta name="description" content="Abhranil Sarkar — Electronics and Biomedical Engineering researcher. Embedded systems, biomedical signal processing, neuro-engineering. Project Trainee, ISRO Human Space Flight Centre.">
+<title>Abhranil Sarkar — Neural Signal Processing &amp; Computational Neuroscience</title>
+<meta name="description" content="Abhranil Sarkar — final-year B.Tech student in Electronics &amp; Communication Engineering (Biomedical) at VIT Vellore. Incoming research attachment at A*STAR, Singapore; formerly ISRO Human Space Flight Centre. Seeking a direct PhD for Fall 2027.">
 <meta name="theme-color" content="#F2EEE7">
+<link rel="canonical" href="https://ivxn404.github.io/portfolio/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -79,7 +80,7 @@ i,em{font-family:var(--serif);font-style:italic}
 .topbar.on-dark{color:var(--paper)}
 .topbar.on-dark .micro{color:#a9a08e}
 .topbar .nm{font-family:var(--serif);font-size:1.05rem;letter-spacing:.01em}
-.topnav{display:flex;gap:30px}
+.topnav{display:flex;gap:28px}
 .topnav a{position:relative}
 .topnav a::after{content:'';position:absolute;left:0;bottom:-3px;height:1px;width:0;
   background:var(--accent);transition:width .35s var(--ease)}
@@ -113,9 +114,9 @@ i,em{font-family:var(--serif);font-style:italic}
   opacity:0;transform:translateY(16px);transition:opacity .9s .5s var(--ease),transform .9s .5s var(--ease);
 }
 .loaded .hero-sub{opacity:1;transform:none}
-.hero-state{font-family:var(--serif);font-size:clamp(1.3rem,3.1vw,2.15rem);line-height:1.22;max-width:17ch}
+.hero-state{font-family:var(--serif);font-size:clamp(1.3rem,3.1vw,2.15rem);line-height:1.22;max-width:19ch}
 .hero-right{text-align:right;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
-.hero-right .val{font-family:var(--serif);font-size:1.15rem}
+.hero-right .val{font-family:var(--serif);font-size:1.15rem;line-height:1.25}
 .scrollcue{
   display:flex;align-items:center;gap:11px;padding:18px 0 22px;
   opacity:0;transition:opacity .9s .8s;
@@ -131,7 +132,7 @@ i,em{font-family:var(--serif);font-style:italic}
   border-top:1px solid var(--line);border-bottom:1px solid var(--line);
   padding:16px 0;overflow:hidden;white-space:nowrap;background:var(--paper);
 }
-.marq-in{display:inline-flex;animation:slide 34s linear infinite;will-change:transform}
+.marq-in{display:inline-flex;animation:slide 38s linear infinite;will-change:transform}
 .marq:hover .marq-in{animation-play-state:paused}
 .marq span{
   font-family:var(--serif);font-size:clamp(1.15rem,2.4vw,1.9rem);
@@ -143,16 +144,19 @@ i,em{font-family:var(--serif);font-style:italic}
 /* ---------- affiliations band ---------- */
 .affil{padding:clamp(44px,7vh,78px) var(--pad);border-bottom:1px solid var(--line)}
 .affil-row{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  gap:clamp(24px,4vw,54px);margin-top:30px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));
+  gap:clamp(24px,3.4vw,46px);margin-top:30px;
 }
 .affil-item{padding-top:20px;border-top:1px solid var(--line);position:relative}
 .affil-item::after{content:'';position:absolute;left:0;top:-1px;height:2px;width:0;
   background:var(--accent);transition:width .55s var(--ease)}
 .affil-item:hover::after{width:100%}
-.am{display:block;font-family:var(--serif);font-size:clamp(1.75rem,4.4vw,3.05rem);
+.a-tag{display:block;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:10px}
+.a-tag.past{color:var(--ink-3)}
+.am{display:block;font-family:var(--serif);font-size:clamp(1.65rem,4vw,2.8rem);
   line-height:.98;letter-spacing:-.028em}
-.as{display:block;margin-top:11px;font-size:.68rem;letter-spacing:.19em;
+.as{display:block;margin-top:11px;font-size:.66rem;letter-spacing:.17em;
   text-transform:uppercase;color:var(--ink-3);line-height:1.7}
 
 /* ---------- sections ---------- */
@@ -190,6 +194,13 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 .fact .f-val{font-family:var(--serif);font-size:1.22rem;color:var(--accent);white-space:nowrap}
 
 /* ---------- research direction ---------- */
+.prop{
+  margin-bottom:clamp(40px,6vh,64px);padding:26px 0 0;border-top:1px solid var(--ink);
+}
+.prop .p-lab{display:block;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:14px}
+.prop .p-ttl{font-family:var(--serif);font-size:clamp(1.4rem,3.2vw,2.2rem);
+  line-height:1.16;letter-spacing:-.015em;max-width:30ch}
 .threads{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));
   gap:clamp(30px,4vw,52px);margin-top:clamp(44px,6vh,70px)}
 .thread{border-top:1px solid var(--ink);padding-top:22px}
@@ -223,7 +234,6 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 .xrow:hover .xhead{padding-left:20px}
 .xhead>.xnum,.xhead>.xdate{padding-top:.5em}
 .xnum{font-family:var(--serif);font-size:.95rem;color:var(--accent);min-width:26px}
-/* institution leads the hierarchy */
 .xorg-big{
   display:block;font-family:var(--serif);font-weight:400;
   font-size:clamp(2.05rem,6.1vw,4.35rem);line-height:.94;letter-spacing:-.028em;
@@ -247,7 +257,7 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
 .xbody{position:relative;z-index:1;max-height:0;overflow:hidden;
   transition:max-height .65s var(--ease)}
-.xrow.open .xbody{max-height:1000px}
+.xrow.open .xbody{max-height:1100px}
 .xbody-in{padding:0 0 32px clamp(0px,3vw,44px);display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px 44px;max-width:1100px}
 .xbody-in p{color:var(--ink-2);font-size:.94rem;line-height:1.66;
@@ -267,7 +277,7 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 .hstick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:flex;align-items:center}
 .htrack{display:flex;align-items:stretch;gap:26px;padding:0 var(--pad);will-change:transform}
 .panel{
-  width:clamp(300px,46vw,560px);flex:none;
+  width:clamp(300px,44vw,530px);flex:none;
   border-top:1px solid var(--ink);padding-top:24px;
   display:flex;flex-direction:column;
 }
@@ -290,6 +300,8 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
   border-bottom:1px solid var(--ink);transition:color .3s,border-color .3s,gap .3s var(--ease)}
 .p-link:hover{color:var(--accent);border-color:var(--accent);gap:17px}
 .p-link span{transition:transform .3s var(--ease)}
+.p-status{font-size:.68rem;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--ink-3);align-self:flex-start;padding-bottom:5px;border-bottom:1px solid var(--line)}
 .divider{
   width:clamp(140px,15vw,200px);flex:none;position:relative;
   border-top:1px solid transparent;
@@ -316,6 +328,12 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 .lead{display:grid;grid-template-columns:minmax(140px,.9fr) 3.1fr;gap:clamp(28px,6vw,90px)}
 .lead h3{font-family:var(--serif);font-size:clamp(1.5rem,3.2vw,2.3rem);line-height:1.16;margin-bottom:9px}
 .lead .l-org{color:var(--accent);font-size:.9rem;margin-bottom:26px}
+.roles{border-top:1px solid var(--line);margin-bottom:28px}
+.role{display:grid;grid-template-columns:auto 1fr;gap:10px 22px;padding:14px 0;
+  border-bottom:1px solid var(--line);align-items:baseline}
+.role .r-n{font-family:var(--serif);font-size:.9rem;color:var(--accent)}
+.role .r-t{font-family:var(--serif);font-size:1.15rem;line-height:1.3}
+.role .r-d{color:var(--ink-2);font-size:.86rem;margin-top:3px}
 .lead p.li{color:var(--ink-2);font-size:.97rem;line-height:1.7;padding-left:19px;position:relative;max-width:70ch}
 .lead p.li+p.li{margin-top:12px}
 .lead p.li::before{content:'';position:absolute;left:0;top:.7em;width:9px;height:1px;background:var(--accent)}
@@ -327,7 +345,7 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 .c-big{font-family:var(--serif);font-size:clamp(2.1rem,6.4vw,5.2rem);line-height:1.06;
   letter-spacing:-.02em;margin-bottom:14px;max-width:16ch}
 .c-big em{color:#E8734F}
-.c-sub{color:#a9a08e;max-width:52ch;margin-bottom:clamp(40px,6vh,70px);font-size:1.02rem}
+.c-sub{color:#a9a08e;max-width:54ch;margin-bottom:clamp(40px,6vh,70px);font-size:1.02rem}
 .c-mail{
   display:inline-block;font-family:var(--serif);
   font-size:clamp(1.3rem,4.4vw,3.1rem);letter-spacing:-.015em;
@@ -366,6 +384,7 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
   .divider{width:100%;padding-top:12px;height:auto}
   .divider .d-in{position:static;transform:none}
   .hprog,.hhint{display:none}
+  .role{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;animation-iteration-count:1!important;
@@ -397,7 +416,7 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 <!-- ============ HERO ============ -->
 <header class="hero" id="top">
   <div class="hero-top micro">
-    <span>Electronics &amp; Biomedical Engineering</span>
+    <span>Final-year B.Tech — Electronics &amp; Biomedical Engineering</span>
     <span>Portfolio — MMXXVI</span>
   </div>
 
@@ -408,11 +427,11 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
     </h1>
 
     <div class="hero-sub">
-      <p class="hero-state">Signals, physiology, and the <em>systems between them.</em></p>
+      <p class="hero-state">What a measurement can <em>actually recover</em> about the brain.</p>
       <div class="hero-right">
-        <span class="micro">Currently</span>
-        <span class="val">ISRO — Human Space Flight Centre</span>
-        <span class="micro">Human Digital Twin · BMED, Bengaluru</span>
+        <span class="micro">Incoming — Research Attachment</span>
+        <span class="val">A*STAR — Institute for Infocomm Research</span>
+        <span class="micro">EEG Manifold Representations for Cognition<br>Singapore · from Dec 2026</span>
         <span class="micro" style="margin-top:14px;color:var(--accent)">Seeking direct PhD — Fall 2027</span>
       </div>
     </div>
@@ -426,10 +445,10 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 
 <div class="marq" aria-hidden="true">
   <div class="marq-in">
-    <span>Neuro-Engineering</span><span>Biomedical Optics</span><span>Embedded Systems</span>
-    <span>Signal Processing</span><span>Edge AI</span><span>Instrumentation</span>
-    <span>Neuro-Engineering</span><span>Biomedical Optics</span><span>Embedded Systems</span>
-    <span>Signal Processing</span><span>Edge AI</span><span>Instrumentation</span>
+    <span>Neural Signal Processing</span><span>Computational Neuroscience</span><span>EEG Decoding</span>
+    <span>Biomedical Optics</span><span>Embedded Systems</span><span>Edge AI</span>
+    <span>Neural Signal Processing</span><span>Computational Neuroscience</span><span>EEG Decoding</span>
+    <span>Biomedical Optics</span><span>Embedded Systems</span><span>Edge AI</span>
   </div>
 </div>
 
@@ -438,14 +457,22 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
   <span class="micro">Research affiliations</span>
   <div class="affil-row">
     <div class="affil-item">
+      <span class="a-tag">Incoming · Dec 2026</span>
+      <span class="am">A*STAR</span>
+      <span class="as">Institute for Infocomm Research<br>Singapore</span>
+    </div>
+    <div class="affil-item">
+      <span class="a-tag past">Former · 2026</span>
       <span class="am">ISRO</span>
       <span class="as">Human Space Flight Centre<br>Biomedical Engineering Division</span>
     </div>
     <div class="affil-item">
+      <span class="a-tag past">Former · 2025</span>
       <span class="am">CSIR&#8203;-CMERI</span>
       <span class="as">Central Mechanical Engineering<br>Research Institute, Durgapur</span>
     </div>
     <div class="affil-item">
+      <span class="a-tag past">2023 — 2027</span>
       <span class="am">VIT</span>
       <span class="as">Vellore Institute of Technology<br>B.Tech ECE — Biomedical</span>
     </div>
@@ -459,33 +486,33 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
       <div class="lbl"><span class="micro">Ⅰ — About</span></div>
     </div>
     <div>
-      <p class="stmt rv" data-split>I build the instruments that listen to the body — and the models that <em>understand what they hear.</em></p>
+      <p class="stmt rv" data-split>I build the instruments that listen to the body — and I test <em>how much they can honestly tell us.</em></p>
 
       <div class="about-cols rv">
         <div>
-          <p>I'm an Electronics &amp; Communication Engineering student at <strong>VIT Vellore</strong>, specialising in Biomedical Engineering. My work sits on the boundary between embedded hardware and computational neuroscience: designing the sensing circuit, writing the real-time conditioning, and building the model that turns a raw waveform into something a clinician — or a flight surgeon — can act on.</p>
-          <p>At <strong>ISRO's Human Space Flight Centre</strong> I develop cross-modal deep learning frameworks for EEG and ECG telemetry, reconstructing and classifying physiological signals for astronaut fatigue and anomaly detection.</p>
+          <p>I'm a final-year Electronics &amp; Communication Engineering student at <strong>VIT Vellore</strong>, specialising in Biomedical Engineering. My work runs from the sensing circuit up through real-time conditioning to the model that interprets the waveform — and, increasingly, to the question of what such a model is genuinely entitled to claim.</p>
+          <p>From December 2026 I join <strong>A*STAR's Institute for Infocomm Research</strong> in Singapore for a research attachment under Dr. Phua Kok Soon and Koh Tze Hui, asking whether wet-electrode EEG recorded from other people can reduce the calibration a new user needs on a dry-electrode headband.</p>
         </div>
         <div>
-          <p>Earlier work at <strong>CSIR-CMERI</strong> covered analog sensor instrumentation for assistive robotics and CNN-based histopathology classification, and an industrial placement took me into vibration monitoring and PCB design for CNC spindle diagnostics.</p>
-          <p>My research interests centre on <strong>neuro-engineering, diffuse optical tomography, and edge-deployable biomedical AI</strong> — particularly systems that stay reliable outside the lab, in resource-limited or high-stakes environments.</p>
+          <p>Earlier this year at <strong>ISRO's Human Space Flight Centre</strong> I built a cross-modal EEG/ECG reconstruction framework in the Biomedical Engineering Division. It worked within cohort and then failed to generalise across subjects — a negative result that turned out to be the most useful thing I have produced, and the reason the Singapore project exists.</p>
+          <p>Before that, <strong>CSIR-CMERI Durgapur</strong> under Dr. Soumen Mandal, and an embedded-systems placement in industrial predictive maintenance. Alongside those, a line of work in <strong>diffuse optics and forward modelling</strong> of near-infrared light transport in cortical tissue.</p>
         </div>
       </div>
 
       <div class="facts rv">
         <div class="fact">
-          <span class="micro micro-ink">2023 — Now</span>
+          <span class="micro micro-ink">2023 — Jul 2027</span>
           <span><span class="f-deg">B.Tech, Electronics &amp; Communication</span><br><span class="f-inst">Biomedical Engineering specialisation · Vellore Institute of Technology</span></span>
           <span class="f-val">8.14</span>
         </div>
         <div class="fact">
           <span class="micro micro-ink">2021 — 2023</span>
-          <span><span class="f-deg">Class XII</span><br><span class="f-inst">Hem Sheela Model School</span></span>
-          <span class="f-val">90%</span>
+          <span><span class="f-deg">Class XII — CBSE</span><br><span class="f-inst">Hem Sheela Model School</span></span>
+          <span class="f-val">88%</span>
         </div>
         <div class="fact">
           <span class="micro micro-ink">2010 — 2021</span>
-          <span><span class="f-deg">Class X</span><br><span class="f-inst">St. Xavier's School</span></span>
+          <span><span class="f-deg">Class X — ICSE</span><br><span class="f-inst">St. Xavier's School</span></span>
           <span class="f-val">94%</span>
         </div>
       </div>
@@ -497,40 +524,45 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 <section id="research">
   <div class="lbl"><span class="micro">Ⅱ — Research direction</span><span class="micro">Doctoral intent</span></div>
 
-  <p class="stmt rv" data-split style="max-width:26ch">I want to build the instruments that read brain state — and the inference layer that <em>makes them mean something.</em></p>
+  <p class="stmt rv" data-split style="max-width:28ch">What a non-invasive measurement can recover depends on the <em>head it is recorded from</em> — not only the montage.</p>
+
+  <div class="prop rv">
+    <span class="p-lab">Doctoral proposal</span>
+    <span class="p-ttl">Anatomy-Conditioned Recoverability in Non-Invasive Neural Measurement</span>
+  </div>
 
   <div class="about-cols rv" style="max-width:82ch">
     <div>
-      <p>My trajectory has been from <strong>biomedical engineer toward neuroscientist</strong>: I started at the circuit — stretch sensors, accelerometers, embedded FFT on an STM32 — and moved steadily up the stack toward the question of what a physiological signal actually tells you about the system producing it.</p>
+      <p>The proposal argues that identifiability of cortical mechanism from scalp measurement is <strong>conditional on individual head anatomy</strong>, not a fixed property of an electrode layout. The method is a simulation chain in which ground truth is known by construction, so recoverability can be measured rather than assumed.</p>
     </div>
     <div>
-      <p>A direct PhD is the right vehicle because the problems I care about don't separate cleanly into hardware and analysis. A photon transport model is only as useful as the probe geometry it assumes; a seizure classifier is only as useful as the wearable it can run on. I want to work across that whole span.</p>
+      <p>It grew out of a failure. My ISRO work reconstructed EEG from ECG at high fidelity within cohort, then collapsed on a held-out subject set. Rather than retire the result, I took the question seriously: <strong>what is it about a person that decides whether a model transfers to them?</strong></p>
     </div>
   </div>
 
   <div class="threads">
     <div class="thread rv">
       <span class="t-n">Thread 01</span>
-      <h3>Multimodal neural decoding</h3>
-      <p>Cross-modal reconstruction between EEG and ECG, and Transformer-based classification of physiological anomaly — currently applied to astronaut fatigue telemetry and a Human Digital Twin programme at ISRO.</p>
-      <span class="t-q">How much of one modality's information is latent in another — and what does shared structure reveal about underlying physiological state?</span>
+      <h3>Identifiability from non-invasive measurement</h3>
+      <p>Building a forward-and-inverse simulation chain where the generating mechanism is specified, so that what a montage can and cannot recover becomes an measurable quantity conditioned on anatomy.</p>
+      <span class="t-q">Which cortical mechanisms are recoverable from the scalp for <em>this</em> head, and which are structurally invisible?</span>
     </div>
     <div class="thread rv">
       <span class="t-n">Thread 02</span>
-      <h3>Non-invasive optical neuroimaging</h3>
-      <p>Finite-element forward modelling of near-infrared photon diffusion in cortical tissue, validated against Monte Carlo, and whole-body NIR transport simulation across heterogeneous anatomy.</p>
-      <span class="t-q">How far can diffuse optics be pushed toward reliable cortical readout outside a controlled lab environment?</span>
+      <h3>What transfers across people and hardware</h3>
+      <p>The ISRO cross-modal result held within cohort and failed across subjects on a held-out database. The A*STAR attachment takes the next step: selective wet-to-dry EEG transfer, with negative transfer built into the analysis rather than hidden by an average.</p>
+      <span class="t-q">Can recordings from other people reduce calibration for a new one — and who is made worse off when they do?</span>
     </div>
     <div class="thread rv">
       <span class="t-n">Thread 03</span>
-      <h3>Edge-deployable biomedical inference</h3>
-      <p>Real-time embedded DSP, 1D-CNN seizure detection built for ambulatory monitoring, and wearable tremor sensing — models constrained by what a microcontroller on a person's body can actually sustain.</p>
-      <span class="t-q">What survives the move from GPU to embedded target, and what does that constraint teach us about the signal?</span>
+      <h3>Forward modelling &amp; neurophotonics</h3>
+      <p>Finite-element modelling of near-infrared photon diffusion in cortical tissue, validated against Monte Carlo, plus whole-body NIR transport across heterogeneous anatomy — the physics side of the same identifiability question.</p>
+      <span class="t-q">How far can diffuse optics be pushed toward reliable cortical readout outside a controlled lab?</span>
     </div>
   </div>
 
   <div class="seeking rv">
-    <span class="s-v">Seeking a <em>direct PhD</em> for Fall 2027 in computational neuroscience or biomedical signal processing.</span>
+    <span class="s-v">Seeking a <em>direct PhD</em> for Fall 2027 in computational neuroscience or neural signal processing.</span>
     <span class="micro">Open to enquiries — <a href="#contact" style="border-bottom:1px solid var(--line)">get in touch</a></span>
   </div>
 </section>
@@ -544,20 +576,19 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
       <div class="xhead" role="button" tabindex="0" aria-expanded="true">
         <span class="xnum">01</span>
         <span>
-          <span class="xorg-big">ISRO</span>
-          <span class="xorg-full">Indian Space Research Organisation</span>
-          <span class="xrole">Project Trainee &amp; Research Intern</span>
-          <span class="xplace">Human Space Flight Centre (HSFC) · Biomedical Engineering Division · Bengaluru</span>
+          <span class="xorg-big">A*STAR</span>
+          <span class="xorg-full">Agency for Science, Technology and Research</span>
+          <span class="xrole">Research Attachment — EEG Manifold Representations for Cognition</span>
+          <span class="xplace">Institute for Infocomm Research (I²R) · Singapore · Supervisors: Dr. Phua Kok Soon, Koh Tze Hui</span>
         </span>
-        <span class="xdate"><span class="xnow">May 2026 — Present</span></span>
+        <span class="xdate"><span class="xnow">From Dec 2026</span></span>
         <span class="xtoggle"></span>
       </div>
       <div class="xbody"><div class="xbody-in">
-        <p>Fast-tracked onto the divisional <strong>Human Digital Twin</strong> mega-project in BMED following a standalone implementation of a high-performance signal processing framework during an on-site internship at the Astronaut Training Facility.</p>
-        <p>Processed raw signal files containing 5,000+ biological waveform segments; designed a high-frequency filtering engine harmonising multimodal telemetry with processing bounds up to 45 Hz.</p>
-        <p>Engineered cross-modal networks reaching &gt;99% signal tracking accuracy; pioneered diagnostic Transformer classification mapping compressed global token matrices to 10 distinct anomaly classes.</p>
-        <p>Collaborating with staff scientists to scale and integrate technical workflows into official divisional systems using Python/MATLAB architectures for multi-dimensional datasets.</p>
-        <p>Maintained training loop convergence under extreme dataset variance, reducing initial loss by over 35%.</p>
+        <p>Final-semester bachelor's thesis attachment: transferring selected representations from a wet-electrode EEG encoder to a dry-electrode encoder, so that a low-dimensional frontal manifold can support headband-grade inference.</p>
+        <p>Central question — can wet EEG collected from other people reduce the calibration a new person needs on dry EEG?</p>
+        <p>Three sub-questions, each with its own reporting standard: whether it generalises to new people, whether it reduces labelled-trial requirements, and <strong>who it harms</strong> — individual gains and losses reported separately, since a higher mean can conceal negative transfer.</p>
+        <p>Baselines first, then selective transfer with controlled ablations as the main modelling contribution; public wet and dry EEG recordings across 102 subjects.</p>
       </div></div>
     </article>
 
@@ -565,18 +596,20 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
       <div class="xhead" role="button" tabindex="0" aria-expanded="false">
         <span class="xnum">02</span>
         <span>
-          <span class="xorg-big">North Technoprojects</span>
-          <span class="xorg-full">India Pvt. Ltd.</span>
-          <span class="xrole">Hardware &amp; Embedded Systems Intern</span>
-          <span class="xplace">Industrial instrumentation &amp; CNC diagnostics · West Bengal</span>
+          <span class="xorg-big">ISRO</span>
+          <span class="xorg-full">Indian Space Research Organisation</span>
+          <span class="xrole">Corresponding Project Trainee</span>
+          <span class="xplace">Human Space Flight Centre (HSFC) · Biomedical Engineering Division · Bengaluru</span>
         </span>
-        <span class="xdate">Jun — Jul 2025</span>
+        <span class="xdate">May — Jun 2026</span>
         <span class="xtoggle"></span>
       </div>
       <div class="xbody"><div class="xbody-in">
-        <p>Designed a real-time vibration monitoring system using an STM32F103C8T6 MCU and ADXL345 3-axis accelerometer, sampling at 3200 Hz for spindle wear detection in industrial CNC machines.</p>
-        <p>Developed a 256-point embedded FFT in C++ for real-time frequency-domain analysis, achieving 98% fault detection accuracy and reducing unexpected breakdowns by 18%.</p>
-        <p>Engineered a compact 2-layer KiCad PCB with 40% footprint reduction; implemented RS485 Modbus SCADA integration with &lt;120 ms latency for industrial IoT connectivity.</p>
+        <p>Built an independent cross-modal EEG/ECG reconstruction framework in BMED using transformer architectures with 1D-CNN synthesis, on telemetry comprising 5,000+ biological waveform segments.</p>
+        <p>Designed a high-frequency filtering engine to harmonise multimodal inputs with processing bounds up to 45 Hz.</p>
+        <p>Reconstruction reached &gt;99% signal tracking <strong>within cohort</strong> — a self-recognition result, not cross-subject generalisation. Held out against an independent database, transfer failed.</p>
+        <p>That negative holdout is the finding I carried forward: it localises the problem to inter-subject and inter-hardware variability, and directly motivates the A*STAR selective-transfer project.</p>
+        <p>Diagnostic transformer classification mapping compressed global token matrices to 10 anomaly classes; training-loop convergence maintained under high dataset variance.</p>
       </div></div>
     </article>
 
@@ -584,19 +617,38 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
       <div class="xhead" role="button" tabindex="0" aria-expanded="false">
         <span class="xnum">03</span>
         <span>
+          <span class="xorg-big">North Technoprojects</span>
+          <span class="xorg-full">India Pvt. Ltd.</span>
+          <span class="xrole">Hardware &amp; Embedded Systems Intern</span>
+          <span class="xplace">Smart embedded architectures for predictive maintenance in CNC &amp; hydraulic systems · Durgapur</span>
+        </span>
+        <span class="xdate">May — Jul 2025</span>
+        <span class="xtoggle"></span>
+      </div>
+      <div class="xbody"><div class="xbody-in">
+        <p>Sole contributor on "Design of Smart Embedded Architectures for Predictive Maintenance and Closed-Loop Optimization in CNC and Hydraulic Systems" across 32 working days.</p>
+        <p>Real-time vibration monitoring on an STM32F103C8T6 with an ADXL345 3-axis accelerometer, sampling at 3200 Hz for spindle wear detection.</p>
+        <p>256-point embedded FFT in C++ for frequency-domain analysis, reaching 98% fault detection accuracy and reducing unexpected breakdowns by 18%.</p>
+        <p>Compact 2-layer KiCad PCB with 40% footprint reduction; RS485 Modbus SCADA integration under 120 ms latency.</p>
+      </div></div>
+    </article>
+
+    <article class="xrow rv">
+      <div class="xhead" role="button" tabindex="0" aria-expanded="false">
+        <span class="xnum">04</span>
+        <span>
           <span class="xorg-big">CSIR&#8203;-CMERI</span>
           <span class="xorg-full">Council of Scientific &amp; Industrial Research</span>
           <span class="xrole">Research Intern</span>
-          <span class="xplace">Central Mechanical Engineering Research Institute · Mechatronics Dept. · Durgapur</span>
+          <span class="xplace">Central Mechanical Engineering Research Institute · Mechatronics Dept. · Durgapur · Under Dr. Soumen Mandal</span>
         </span>
         <span class="xdate">May — Jun 2025</span>
         <span class="xtoggle"></span>
       </div>
       <div class="xbody"><div class="xbody-in">
         <p>Engineered and calibrated 16+ analog stretch sensor circuits for a full hand using voltage divider networks and Arduino Uno boards to quantify grasp strength in a micro-motor feedback system, matching reference curves within ±0.02 V.</p>
-        <p>Programmed voltage-to-resistance conversion algorithms in embedded C to classify hand gestures (open, semi-flexed, clenched), achieving 97.8% recognition accuracy across calibrated units.</p>
-        <p>Designed and trained a custom CNN for multi-class cancer classification across 6 tissue types — 97.3% accuracy, 97.1% precision, 97.6% F1 on unseen biopsy images.</p>
-        <p>Applied transfer learning and dynamic augmentation to counter class imbalance, improving minority-class prediction by 13.5% over baseline.</p>
+        <p>Programmed voltage-to-resistance conversion algorithms in embedded C to classify hand gestures (open, semi-flexed, clenched) at 97.8% recognition accuracy across calibrated units.</p>
+        <p>Trained a custom CNN for multi-class tissue classification across 6 histopathology types, with transfer learning and dynamic augmentation to counter class imbalance.</p>
       </div></div>
     </article>
   </div>
@@ -604,24 +656,24 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 
 <!-- ============ WORK (horizontal) ============ -->
 <section class="work-intro" id="work">
-  <div class="lbl"><span class="micro">Ⅳ — Selected projects</span><span class="micro">Nine works</span></div>
-  <p class="stmt rv" data-split style="max-width:20ch;margin-bottom:0">Nine investigations in <em>signal, tissue &amp; inference.</em></p>
+  <div class="lbl"><span class="micro">Ⅳ — Selected projects</span><span class="micro">Twelve works</span></div>
+  <p class="stmt rv" data-split style="max-width:22ch">Twelve investigations in <em>signal, tissue &amp; inference.</em></p>
 </section>
 
 <div class="hwrap" id="hwrap">
   <div class="hstick">
     <div class="htrack" id="htrack">
 
-      <div class="divider"><div class="d-in">Ⅰ &nbsp;Neuro-Engineering</div></div>
+      <div class="divider"><div class="d-in">Ⅰ &nbsp;Neural Signal &amp; Decoding</div></div>
 
       <article class="panel">
         <div class="p-top"><span class="p-num">01<sup>ISRO</sup></span></div>
-        <h3 class="p-title">Cross-Modal Reconstruction of EEG &amp; ECG for Predictive Fatigue Classification</h3>
+        <h3 class="p-title">Cross-Modal Reconstruction of EEG from ECG</h3>
         <div class="p-body">
-          <p>Processed 5,000+ biological waveform segments from large telemetry pools at ISRO HSFC.</p>
-          <p>Built a high-frequency filtering engine harmonising multimodal telemetry up to 45 Hz.</p>
-          <p>Cross-modal networks achieving &gt;99% signal tracking accuracy for waveform synthesis.</p>
-          <p>Transformer-based diagnostic classification across 10 anomaly classes; 35%+ loss reduction.</p>
+          <p>Transformer architecture with 1D-CNN synthesis over 5,000+ waveform segments of ISRO HSFC telemetry.</p>
+          <p>High-frequency filtering engine harmonising multimodal inputs up to 45 Hz.</p>
+          <p>&gt;99% signal tracking within cohort — self-recognition rather than cross-subject generalisation.</p>
+          <p>Failed on an independent held-out database. Reported as the primary finding; it localises the barrier to inter-subject and inter-hardware variability.</p>
         </div>
         <div class="p-tags"><b>Transformers</b><b>Multimodal DSP</b><b>Python</b></div>
         <a class="p-link" href="https://drive.google.com/file/d/1rihL5mj62eKVIuGT3_Oed1usPHnq4piZ/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
@@ -629,11 +681,11 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 
       <article class="panel">
         <div class="p-top"><span class="p-num">02</span></div>
-        <h3 class="p-title">Neurological Intelligence System — Automated Epileptic Seizure Detection</h3>
+        <h3 class="p-title">Multi-Modal Framework for Automated Epileptic Seizure Detection</h3>
         <div class="p-body">
-          <p>1D-CNN and spectrogram analysis reaching 97.6% classification accuracy in real-time seizure detection.</p>
-          <p>Integrated temporal feature extraction with frequency-domain dimensionality reduction (PCA).</p>
-          <p>Edge-ready design for continuous ambulatory EEG monitoring and rapid clinical intervention.</p>
+          <p>1D-CNN over raw EEG combined with spectrogram analysis for real-time seizure detection.</p>
+          <p>Temporal feature extraction paired with frequency-domain dimensionality reduction (PCA).</p>
+          <p>Designed edge-ready for continuous ambulatory EEG monitoring rather than offline batch scoring.</p>
         </div>
         <div class="p-tags"><b>1D-CNN</b><b>EEG</b><b>PCA</b><b>Spectrograms</b></div>
         <a class="p-link" href="https://docs.google.com/presentation/d/1A-0nxe9CPnzMxAreufKa9h3hWmGErUqH/edit?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
@@ -641,87 +693,125 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 
       <article class="panel">
         <div class="p-top"><span class="p-num">03</span></div>
-        <h3 class="p-title">FEM Forward Modeling of Near-Infrared Photon Diffusion in Cortical Tissue</h3>
-        <div class="p-body">
-          <p>Finite-element photon transport model in NIRFAST at 800 nm — 1,236 nodes, 2,352 triangular elements.</p>
-          <p>Continuous-wave diffusion solves with gray-matter-matched optical parameters; &lt;0.5% variance across mesh refinements.</p>
-          <p>&gt;99.3% agreement with Monte Carlo simulation, max local error &lt;1.2%, R = 0.996 across detector fluence outputs.</p>
-          <p>Source–detector geometry enabling Jacobian sensitivity analysis at sub-3 mm spatial resolution.</p>
-        </div>
-        <div class="p-tags"><b>NIRFAST</b><b>MATLAB</b><b>FEM</b><b>DOT / fNIRS</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/13ai3StiH2g9qiGmBimJEPsfzG_FGzWfl/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
-      </article>
-
-      <article class="panel">
-        <div class="p-top"><span class="p-num">04</span></div>
-        <h3 class="p-title">Elliptical Whole-Body NIR Light Transport Simulator</h3>
-        <div class="p-body">
-          <p>MATLAB framework modelling whole-body near-infrared light transport through an elliptical five-layer tissue cross-section.</p>
-          <p>Dense triangular mesh with configurable source–detector arrangements for fluence distribution in heterogeneous anatomy.</p>
-          <p>Log-fluence maps and source–detector path profiles supporting multi-wavelength sensitivity analysis.</p>
-        </div>
-        <div class="p-tags"><b>MATLAB</b><b>NIR Transport</b><b>Tissue Modeling</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/1nk0uBj_d0mXQQbLxUGzBKP1kSwnE5zEG/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
-      </article>
-
-      <article class="panel">
-        <div class="p-top"><span class="p-num">05</span></div>
-        <h3 class="p-title">Baseline Classification of Brain MRI Scans via Transfer Learning</h3>
-        <div class="p-body">
-          <p>Processed and classified 500+ brain MRI scans across four tumour categories — glioma, meningioma, pituitary, no-tumour — using a modified ResNet-50.</p>
-          <p>Established an early transfer-learning benchmark for resource-constrained medical diagnostic pipelines.</p>
-        </div>
-        <div class="p-tags"><b>TensorFlow / Keras</b><b>ResNet-50</b><b>Medical Imaging</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/12OUgRMhN3E73th4QbKM2vfqrK74S0Hsy/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
-      </article>
-
-      <div class="divider"><div class="d-in">Ⅱ &nbsp;Signals &amp; Applied AI</div></div>
-
-      <article class="panel">
-        <div class="p-top"><span class="p-num">06</span></div>
         <h3 class="p-title">ECG Arrhythmia Classification on the MIT-BIH Database</h3>
         <div class="p-body">
-          <p>Built parallel pipelines using classical ML and 1D-CNNs for automated arrhythmia detection.</p>
-          <p>Engineered domain-driven features from ECG morphology and heart-rate variability, benchmarked against end-to-end deep learning on raw segments.</p>
-          <p>Evaluated accuracy, interpretability and compute cost for deployment in wearable and remote-monitoring systems.</p>
+          <p>Parallel pipelines using classical ML and 1D-CNNs for automated arrhythmia detection.</p>
+          <p>Domain-driven features from ECG morphology and heart-rate variability, benchmarked against end-to-end learning on raw segments.</p>
+          <p>Evaluated on accuracy, interpretability and compute cost for wearable and remote-monitoring deployment.</p>
         </div>
         <div class="p-tags"><b>1D-CNN</b><b>MIT-BIH</b><b>HRV Features</b></div>
         <a class="p-link" href="https://docs.google.com/document/d/13SwOLHxTE49sPiBNSeam5UE5DKBIkubD9z4AB9Hx7GQ/edit?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
       <article class="panel">
-        <div class="p-top"><span class="p-num">07</span></div>
-        <h3 class="p-title">4th-Generation Non-Enzymatic Salivary Glucose Sensor Using CuO Nanozymes</h3>
+        <div class="p-top"><span class="p-num">04</span></div>
+        <h3 class="p-title">Brain MRI Tumour Classification via Transfer Learning</h3>
         <div class="p-body">
-          <p>Developed a shelf-stable abiotic biosensor using copper-oxide nanozymes and a 3D cellulose architecture for decentralised salivary glucose monitoring.</p>
-          <p>Eliminated thermal instability and cold-chain requirements, achieving 98% signal retention over 30 days.</p>
-          <p>Cost-effective, durable platform designed for resource-limited diagnostic settings.</p>
+          <p>500+ brain MRI scans across four categories — glioma, meningioma, pituitary, no-tumour — on a modified ResNet-50.</p>
+          <p>Kept as an instructive baseline: an ImageNet-pretrained backbone transfers poorly to greyscale medical volumes, which is the point of the entry.</p>
+        </div>
+        <div class="p-tags"><b>TensorFlow / Keras</b><b>ResNet-50</b><b>Medical Imaging</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/12OUgRMhN3E73th4QbKM2vfqrK74S0Hsy/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <div class="divider"><div class="d-in">Ⅱ &nbsp;Modelling &amp; Simulation</div></div>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">05<sup>Manuscript</sup></span></div>
+        <h3 class="p-title">FEM Forward Modelling of Near-Infrared Photon Diffusion in Cortical Tissue</h3>
+        <div class="p-body">
+          <p>Finite-element photon transport model rebuilt in Python at 800 nm — 1,236 nodes, 2,352 triangular elements — with a three-stage verification chain.</p>
+          <p>Continuous-wave diffusion solves with gray-matter-matched optical parameters; under 0.5% variance across mesh refinements.</p>
+          <p>Above 99.3% agreement with Monte Carlo simulation, max local error under 1.2%, R = 0.996 across detector fluence outputs.</p>
+          <p>Written up as a seven-page IEEE-format manuscript with 32 references. Not yet submitted.</p>
+        </div>
+        <div class="p-tags"><b>Python</b><b>FEM</b><b>DOT / fNIRS</b><b>Monte Carlo Validation</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/13ai3StiH2g9qiGmBimJEPsfzG_FGzWfl/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">06</span></div>
+        <h3 class="p-title">Elliptical Whole-Body NIR Light Transport Simulator</h3>
+        <div class="p-body">
+          <p>MATLAB framework modelling whole-body near-infrared light transport through an elliptical five-layer tissue cross-section.</p>
+          <p>Dense triangular mesh with configurable source–detector arrangements for fluence distribution in heterogeneous anatomy.</p>
+          <p>Log-fluence maps and source–detector path profiles supporting multi-wavelength sensitivity analysis.</p>
+        </div>
+        <div class="p-tags"><b>MATLAB</b><b>NIR Transport</b><b>Tissue Modelling</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/1nk0uBj_d0mXQQbLxUGzBKP1kSwnE5zEG/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">07</span></div>
+        <h3 class="p-title">Automated FE Pipeline for Flexible Neural Implant Design</h3>
+        <div class="p-body">
+          <p>Automated finite-element pipeline analysing micromotion-induced strain across metals, alloy compositions, cross-section shapes, sizes and filler concentrations.</p>
+          <p>7,400 design configurations solved on a verified in-house Python FE solver; 2,161 feasible. ANSYS cross-validation in progress.</p>
+          <p>Best overall candidate: polyimide with 30 vol% Ti-6Al-4V in a U-channel section. Section shape alone yields roughly 3.4× less cross-sectional area and mass than the solid rectangles used by commercial probes.</p>
+        </div>
+        <div class="p-tags"><b>Python FE Solver</b><b>ANSYS APDL</b><b>Neural Implants</b></div>
+        <span class="p-status">Course project · VIT · Review 3 in progress</span>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">08</span></div>
+        <h3 class="p-title">RL-Driven Adaptive Admittance Control for Neuro-Rehabilitation Robotics</h3>
+        <div class="p-body">
+          <p>Two-layer architecture in which a reinforcement-learning supervisor tunes admittance parameters (K and C) rather than commanding the robot directly.</p>
+          <p>2-link planar arm with a simulated patient exhibiting fatigue and motor-slacking dynamics; interactive parameter sliders.</p>
+          <p>Delivered as a single-file simulation on numpy and matplotlib alone — check, play, gif, sweep, eval, compare and train subcommands.</p>
+        </div>
+        <div class="p-tags"><b>Reinforcement Learning</b><b>Admittance Control</b><b>NumPy</b></div>
+        <span class="p-status">Course project · VIT · Medical Robotics</span>
+      </article>
+
+      <div class="divider"><div class="d-in">Ⅲ &nbsp;Instrumentation &amp; Devices</div></div>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">09</span></div>
+        <h3 class="p-title">Optically-Isolated EEG Transceiver over Plastic Optical Fibre</h3>
+        <div class="p-body">
+          <p>Galvanically isolated EEG acquisition front end: LED transmitter into plastic optical fibre, BPW34 photodiode receiver.</p>
+          <p>Optical isolation removes the mains-referenced leakage path entirely, which is the safety argument for patient-connected amplifiers.</p>
+          <p>DSP conditioning chain feeding 1D-CNN seizure detection on the recovered signal; responsible for the software end of a three-person build.</p>
+        </div>
+        <div class="p-tags"><b>POF</b><b>BPW34</b><b>Analog Front End</b><b>1D-CNN</b></div>
+        <span class="p-status">Course project · VIT · Optical Fibre Communications</span>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">10</span></div>
+        <h3 class="p-title">Wearable Hand Tremor Detection System</h3>
+        <div class="p-body">
+          <p>Low-cost wearable for real-time detection and classification of hand tremors toward early-stage Parkinson's screening.</p>
+          <p>MPU6050 accelerometer/gyroscope with adaptive threshold-based tremor filtering.</p>
+        </div>
+        <div class="p-tags"><b>MPU6050</b><b>Arduino</b><b>Signal Filtering</b></div>
+        <a class="p-link" href="https://drive.google.com/file/d/1EGvJHr2vHYkmI6chr-whrpI4SPSempxX/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+      </article>
+
+      <article class="panel">
+        <div class="p-top"><span class="p-num">11</span></div>
+        <h3 class="p-title">Non-Enzymatic Salivary Glucose Sensor Using CuO Nanozymes</h3>
+        <div class="p-body">
+          <p>Shelf-stable abiotic biosensor using copper-oxide nanozymes and a 3D cellulose architecture for decentralised salivary glucose monitoring.</p>
+          <p>Removes thermal instability and cold-chain requirements, retaining 98% of signal over 30 days.</p>
+          <p>Designed for cost and durability in resource-limited diagnostic settings.</p>
         </div>
         <div class="p-tags"><b>CuO Nanozymes</b><b>Biosensors</b><b>Nanotechnology</b></div>
         <a class="p-link" href="https://drive.google.com/file/d/1muOpAmvC258dXyBV1cUSXz_NjiaC1USF/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
       <article class="panel">
-        <div class="p-top"><span class="p-num">08</span></div>
+        <div class="p-top"><span class="p-num">12</span></div>
         <h3 class="p-title">Client-Side Neural Network Training &amp; Inference Lab</h3>
         <div class="p-body">
-          <p>Single-page web application for in-browser dataset labelling, network construction and real-time hyperparameter tuning.</p>
-          <p>Training and inference executed entirely client-side via WebGL/WebGPU acceleration — no server dependency.</p>
-          <p>Fully client-side model serialisation, advancing federated-learning and edge-AI workflows.</p>
+          <p>Single-page application for in-browser dataset labelling, network construction and real-time hyperparameter tuning.</p>
+          <p>Training and inference entirely client-side via WebGL/WebGPU — no server dependency, no data leaving the device.</p>
+          <p>Client-side model serialisation, aimed at federated-learning and edge-AI workflows.</p>
         </div>
         <div class="p-tags"><b>TensorFlow.js</b><b>WebGL / WebGPU</b><b>Edge AI</b></div>
-        <a class="p-link" href="https://github.com/lvxn404/deepl-mt" target="_blank" rel="noopener">View on GitHub <span>⟶</span></a>
-      </article>
-
-      <article class="panel">
-        <div class="p-top"><span class="p-num">09</span></div>
-        <h3 class="p-title">Wearable Hand Tremor Detection System</h3>
-        <div class="p-body">
-          <p>Low-cost wearable biomedical device for real-time detection and classification of hand tremors toward early-stage Parkinson's screening.</p>
-          <p>Integrated MPU6050 accelerometer/gyroscope with adaptive threshold-based tremor filtering algorithms.</p>
-        </div>
-        <div class="p-tags"><b>MPU6050</b><b>Arduino</b><b>Signal Filtering</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/1EGvJHr2vHYkmI6chr-whrpI4SPSempxX/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
+        <a class="p-link" href="https://github.com/ivxn404/deepl-mt" target="_blank" rel="noopener">View on GitHub <span>⟶</span></a>
       </article>
 
     </div>
@@ -734,12 +824,12 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 <section id="skills">
   <div class="lbl"><span class="micro">Ⅴ — Capabilities</span></div>
   <div class="sk">
-    <div class="sk-g rv"><h3>Core</h3><p>Embedded Systems <span>/</span> Signal Processing <span>/</span> Biomedical Device Development <span>/</span> Hardware Design <span>/</span> Real-Time Systems</p></div>
-    <div class="sk-g rv"><h3>Languages</h3><p>C <span>/</span> C++ <span>/</span> Python <span>/</span> MATLAB <span>/</span> Verilog <span>/</span> ARM Assembly <span>/</span> JavaScript <span>/</span> Java</p></div>
-    <div class="sk-g rv"><h3>Hardware</h3><p>STM32 <span>/</span> Arduino <span>/</span> ADXL345 <span>/</span> MLX90614 <span>/</span> MPU6050 <span>/</span> KiCad <span>/</span> SCADA <span>/</span> RS485 Modbus <span>/</span> I²C · SPI</p></div>
-    <div class="sk-g rv"><h3>DSP</h3><p>FFT Algorithms <span>/</span> Real-Time Conditioning <span>/</span> Sensor Integration <span>/</span> Noise Filtering <span>/</span> Digital Communication</p></div>
-    <div class="sk-g rv"><h3>Platforms</h3><p>TensorFlow <span>/</span> MATLAB <span>/</span> GitHub <span>/</span> VS Code <span>/</span> Azure DevOps <span>/</span> AWS <span>/</span> GCP</p></div>
-    <div class="sk-g rv"><h3>Domains</h3><p>Biomedical Instrumentation <span>/</span> Medical Imaging <span>/</span> Wearable Design <span>/</span> IoT Integration <span>/</span> Industrial Automation</p></div>
+    <div class="sk-g rv"><h3>Core</h3><p>Biomedical Signal Processing <span>/</span> Neural Decoding <span>/</span> Embedded Systems <span>/</span> Forward Modelling <span>/</span> Real-Time Systems</p></div>
+    <div class="sk-g rv"><h3>Languages</h3><p>Python <span>/</span> MATLAB <span>/</span> C <span>/</span> C++ <span>/</span> Verilog <span>/</span> ARM Assembly <span>/</span> JavaScript <span>/</span> Java</p></div>
+    <div class="sk-g rv"><h3>Methods</h3><p>Transformers <span>/</span> 1D-CNNs <span>/</span> Transfer &amp; Representation Learning <span>/</span> Finite Element Analysis <span>/</span> Monte Carlo Validation <span>/</span> PCA</p></div>
+    <div class="sk-g rv"><h3>Signals &amp; DSP</h3><p>EEG <span>/</span> ECG <span>/</span> fNIRS &amp; DOT <span>/</span> FFT Algorithms <span>/</span> Real-Time Conditioning <span>/</span> Noise Filtering</p></div>
+    <div class="sk-g rv"><h3>Hardware</h3><p>STM32 <span>/</span> Arduino <span>/</span> ADXL345 <span>/</span> MPU6050 <span>/</span> BPW34 <span>/</span> KiCad <span>/</span> RS485 Modbus <span>/</span> I²C · SPI</p></div>
+    <div class="sk-g rv"><h3>Platforms</h3><p>TensorFlow <span>/</span> PyTorch <span>/</span> NumPy <span>/</span> ANSYS APDL <span>/</span> NIRFAST <span>/</span> Git <span>/</span> LaTeX</p></div>
   </div>
 </section>
 
@@ -748,11 +838,31 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
   <div class="lead">
     <div><div class="lbl"><span class="micro">Ⅵ — Beyond the lab</span></div></div>
     <div class="rv">
-      <h3>Events &amp; Operations Head</h3>
-      <div class="l-org">Institution's Innovation Council (IIC), VIT Vellore &nbsp;·&nbsp; Apr 2024 — Jul 2025</div>
-      <p class="li">Orchestrated Innovation Week 2025 — 17+ events, 2,000+ participants — promoting emerging technology and research initiatives.</p>
+      <h3>Institution's Innovation Council</h3>
+      <div class="l-org">VIT Vellore &nbsp;·&nbsp; A pan-India government initiative for innovation and startup culture &nbsp;·&nbsp; Apr 2024 — Jul 2025</div>
+
+      <div class="roles">
+        <div class="role">
+          <span class="r-n">01</span>
+          <span>
+            <span class="r-t">Domain Head, Intellectual Property Rights — and concurrently Social Media Coordinator</span>
+            <span class="r-d">The only first-year student among the domain heads.</span>
+          </span>
+        </div>
+        <div class="role">
+          <span class="r-n">02</span>
+          <span><span class="r-t">Head of Events &amp; Operations</span></span>
+        </div>
+        <div class="role">
+          <span class="r-n">03</span>
+          <span><span class="r-t">Head of Human Resources</span></span>
+        </div>
+      </div>
+
+      <p class="li">Orchestrated Innovation Week 2025 — 17+ events, 2,000+ participants — across technology and research initiatives.</p>
       <p class="li">Organised the Yuvamanthan Finals with leading teams from across India in Startup, Hackathon, Tech Transfer and R&amp;D categories.</p>
       <p class="li">Led VIT Vellore's delegation to VIT-AP for a national exhibition, earning accolades for the team.</p>
+      <p class="li">Resigned in July 2025 to pivot back toward research and study.</p>
     </div>
   </div>
 </section>
@@ -760,13 +870,13 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
 <!-- ============ CONTACT ============ -->
 <section class="contact" id="contact">
   <div class="lbl"><span class="micro">Ⅶ — Contact</span><span class="micro">Fall 2027 intake</span></div>
-  <h2 class="c-big rv" data-split>Seeking a direct PhD in <em>computational neuroscience</em> &amp; biomedical signal processing.</h2>
-  <p class="c-sub rv">Applying for Fall 2027 entry. If your lab works on neural decoding, diffuse optical imaging, or physiological signal modelling — or you supervise in an adjacent area — I'd welcome a conversation.</p>
+  <h2 class="c-big rv" data-split>Seeking a direct PhD in <em>computational neuroscience</em> &amp; neural signal processing.</h2>
+  <p class="c-sub rv">Applying for Fall 2027 entry. If your lab works on neural decoding, identifiability in non-invasive measurement, diffuse optical imaging, or physiological signal modelling — or you supervise in an adjacent area — I'd welcome a conversation.</p>
   <a class="c-mail" href="mailto:ivansarkar08@gmail.com">ivansarkar08@gmail.com</a>
   <div class="c-links">
     <a href="https://www.linkedin.com/in/abhranil-sarkar" target="_blank" rel="noopener">LinkedIn</a>
-    <a href="https://github.com/lvxn404" target="_blank" rel="noopener">GitHub</a>
-    <a href="tel:+918250596205">+91 82505 96205</a>
+    <a href="https://github.com/ivxn404" target="_blank" rel="noopener">GitHub</a>
+    <a href="tel:+919800949008">+91 98009 49008</a>
   </div>
   <div class="foot micro">
     <span>© MMXXVI Abhranil Sarkar</span>

@@ -1,537 +1,648 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="paper">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Abhranil Sarkar — Neural Signal Processing &amp; Computational Neuroscience</title>
-<meta name="description" content="Abhranil Sarkar — final-year B.Tech student in Electronics &amp; Communication Engineering (Biomedical) at VIT Vellore. Incoming research attachment at A*STAR, Singapore; formerly ISRO Human Space Flight Centre. Seeking a direct PhD for Fall 2027.">
-<meta name="theme-color" content="#F2EEE7">
+<title>Abhranil Sarkar — Anatomy-Conditioned Recoverability in Non-Invasive Neural Measurement</title>
+<meta name="description" content="Abhranil Sarkar — final-year B.Tech, Electronics &amp; Communication Engineering (Biomedical), VIT Vellore. Research attachment at A*STAR IAIC Singapore; formerly ISRO Human Space Flight Centre. Neural signal processing, identifiability, diffuse optics. Seeking a direct PhD for Fall 2027.">
+<meta name="theme-color" content="#FBFAF7">
 <link rel="canonical" href="https://ivxn404.github.io/portfolio/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════ TOKENS ═══════════════ */
+html[data-theme="paper"]{
+  --bg:#FBFAF7; --bg2:#F3F1EC; --panel:#F8F6F1; --panel2:#EEEBE4;
+  --fg:#15171C; --fg2:#4B515E; --fg3:#848A97;
+  --line:#E3E0D8; --line2:#C8C4BA;
+  --acc:#1C4E80; --acc2:#0F6E61; --acc3:#8A5A00; --acc4:#5B3E9E;
+  --sat:52%; --lit:34%; --grain:.016; --scan:0; --bloom:0;
+}
+html[data-theme="instrument"]{
+  --bg:#0E1117; --bg2:#141821; --panel:#171C26; --panel2:#1E2431;
+  --fg:#ECEEF2; --fg2:#A8AEBC; --fg3:#737A8A;
+  --line:#242A36; --line2:#39414F;
+  --acc:#6BA8DE; --acc2:#45C2AB; --acc3:#D4A64A; --acc4:#9E86DB;
+  --sat:46%; --lit:62%; --grain:.022; --scan:0; --bloom:0;
+}
+:root,#hero,#about,#research,#experience,#work,#bench,#skills,#beyond,#contact{
+  --sa:var(--acc); --sa-dim:rgba(28,78,128,.14);
+}
 :root{
-  --paper:#F2EEE7;
-  --paper-2:#E9E3D7;
-  --paper-3:#DFD8C9;
-  --ink:#17140F;
-  --ink-2:#4C4437;
-  --ink-3:#8B8071;
-  --accent:#BF3B22;
-  --line:#D6CDBD;
+  /* instrument screens are dark in BOTH themes, so their chrome is theme-independent */
+  --scr-fg:#DDE2F0; --scr-fg2:#8A93AB; --scr-line:#1E2534; --scr-line2:#2E3850;
   --serif:'Instrument Serif',ui-serif,Georgia,serif;
   --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --pad:6vw;
-  --ease:cubic-bezier(.22,1,.36,1);
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --pad:clamp(20px,5vw,72px);
+  --ez:cubic-bezier(.22,1,.36,1);
+  --ez2:cubic-bezier(.76,0,.24,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+/* deliberately no scroll-lock here: a stalled timer must never trap the page */
 body{
-  background:var(--paper);color:var(--ink);font-family:var(--sans);
-  font-weight:300;font-size:16px;line-height:1.6;
+  background:var(--bg);color:var(--fg);font-family:var(--sans);
+  font-weight:300;font-size:16px;line-height:1.6;overflow-x:hidden;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-  overflow-x:hidden;
+  transition:background .6s var(--ez),color .6s var(--ez);
 }
 a{color:inherit;text-decoration:none}
-::selection{background:var(--accent);color:var(--paper)}
+canvas{display:block}
+::selection{background:var(--acc);color:var(--bg)}
+html[data-theme="instrument"] ::selection{color:#fff}
 
-/* ---------- grain ---------- */
-.grain{
-  position:fixed;inset:-120%;z-index:9998;pointer-events:none;opacity:.055;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation:grain 8s steps(6) infinite;
-}
-@keyframes grain{
-  0%,100%{transform:translate(0,0)} 16%{transform:translate(-3%,-2%)}
-  33%{transform:translate(2%,-4%)} 50%{transform:translate(-2%,3%)}
-  66%{transform:translate(3%,2%)} 83%{transform:translate(-4%,-1%)}
-}
+/* ═══════════════ OVERLAYS ═══════════════ */
+.fx{position:fixed;inset:0;pointer-events:none;z-index:9000}
+.fx-grain{display:none}
+.fx-vig{display:none}
 
-/* ---------- cursor ---------- */
-.cur,.cur-ring{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;border-radius:50%;
-  mix-blend-mode:difference;opacity:0;transition:opacity .3s}
-.cur{width:7px;height:7px;background:#fff;margin:-3.5px 0 0 -3.5px}
-.cur-ring{width:40px;height:40px;border:1px solid #fff;margin:-20px 0 0 -20px;
-  transition:width .3s var(--ease),height .3s var(--ease),margin .3s var(--ease),
-             background .3s,opacity .3s}
-body.cur-on .cur,body.cur-on .cur-ring{opacity:1}
-body.cur-hover .cur-ring{width:74px;height:74px;margin:-37px 0 0 -37px;background:rgba(255,255,255,.12)}
-body.cur-hover .cur{opacity:0}
+/* ═══════════════ HUD ═══════════════ */
+.hud{position:fixed;z-index:400;font-family:var(--mono);font-size:.64rem;
+  letter-spacing:.17em;text-transform:uppercase;color:var(--fg3);
+  pointer-events:none;transition:opacity .5s}
+.hud b{color:var(--fg2);font-weight:400}
+.hud .v{color:var(--acc2);font-weight:500}
+.hud-tl{top:0;left:0;right:0;display:flex;justify-content:space-between;
+  align-items:center;gap:18px;padding:14px var(--pad);pointer-events:auto;
+  background:var(--bg);
+  background:color-mix(in srgb,var(--bg) 90%,transparent);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line)}
+.hud-tl>*{pointer-events:auto}
+.sig{display:flex;align-items:center;gap:11px}
+.sig-mark{width:26px;height:26px;position:relative;flex:none}
+.sig-mark svg{width:100%;height:100%;overflow:visible}
+.sig-nm{font-family:var(--serif);font-size:1.02rem;letter-spacing:.01em;
+  text-transform:none;color:var(--fg)}
+.hud-ctl{display:flex;align-items:center;gap:9px}
+.btn{background:none;border:1px solid var(--line2);color:var(--fg2);
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.17em;text-transform:uppercase;
+  padding:8px 13px;cursor:pointer;transition:all .25s;white-space:nowrap}
+.btn:hover{border-color:var(--acc);color:var(--acc)}
+.btn.on{border-color:var(--acc2);color:var(--acc2)}
+/* bottom HUD is an overlay: it gets its own scrim so it stays legible
+   over whatever content happens to sit beneath it */
+.hud.dim{opacity:0}
 
-/* ---------- micro type ---------- */
-.micro{
-  font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;font-weight:400;
-  color:var(--ink-3);
-}
-.micro-ink{color:var(--ink-2)}
-.acc{color:var(--accent)}
-.serif{font-family:var(--serif);font-weight:400}
+/* montage nav */
+#montage{position:fixed;right:var(--pad);top:50%;transform:translateY(-50%);
+  z-index:420;width:clamp(92px,9vw,124px);transition:opacity .6s var(--ez)}
+html.booting #montage{opacity:0}
+#montage svg{width:100%;overflow:visible;display:block}
+.el-dot{fill:var(--line2);stroke:none;cursor:pointer;transition:fill .3s,r .3s}
+.el-dot:hover{fill:var(--acc)}
+.el-dot.cur{fill:var(--acc);r:4.2}
+.el-ring{fill:none;stroke:var(--line);stroke-width:1}
+.el-lab{font-family:var(--mono);font-size:4.4px;fill:var(--fg3);
+  letter-spacing:.06em;text-anchor:middle;pointer-events:none;text-transform:uppercase}
+#montageTip{position:absolute;right:calc(100% + 12px);top:0;white-space:nowrap;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--acc2);opacity:0;transition:opacity .25s,top .25s var(--ez);pointer-events:none}
+
+/* probe cursor */
+
+/* ═══════════════ TYPE ═══════════════ */
+.mono{font-family:var(--mono);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--fg3)}
+.mono.lit{color:var(--acc2)}
+.mono.hot{color:var(--acc)}
+.ser{font-family:var(--serif);font-weight:400}
 i,em{font-family:var(--serif);font-style:italic}
+html[data-theme="paper"] .ca::before{color:#D62F0E;transform:translate(-.028em,.008em)}
+html[data-theme="paper"] .ca::after{color:#0067C4;transform:translate(.028em,-.008em)}
 
-/* ---------- top bar ---------- */
-.topbar{
-  position:fixed;top:0;left:0;right:0;z-index:200;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:22px var(--pad);
-  transition:transform .45s var(--ease),color .4s;
+/* ═══════════════ LAYOUT ═══════════════ */
+.sec{position:relative;padding:clamp(76px,13vh,172px) var(--pad);z-index:2}
+/* each section carries a hue stripe down its left edge */
+.sec::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:var(--line)}
+.shead{display:flex;align-items:baseline;gap:16px;margin-bottom:clamp(36px,6vh,66px);flex-wrap:wrap}
+.shead::after{content:'';flex:1;height:1px;min-width:30px;background:var(--line);
+  background:linear-gradient(90deg,var(--sa),color-mix(in srgb,var(--sa) 22%,transparent) 55%,transparent)}
+.shead .idn{font-family:var(--mono);font-size:.64rem;letter-spacing:.22em;color:var(--sa);
 }
-.topbar.hide{transform:translateY(-110%)}
-.topbar.on-dark{color:var(--paper)}
-.topbar.on-dark .micro{color:#a9a08e}
-.topbar .nm{font-family:var(--serif);font-size:1.05rem;letter-spacing:.01em}
-.topnav{display:flex;gap:28px}
-.topnav a{position:relative}
-.topnav a::after{content:'';position:absolute;left:0;bottom:-3px;height:1px;width:0;
-  background:var(--accent);transition:width .35s var(--ease)}
-.topnav a:hover::after{width:100%}
-.topnav a:hover{color:var(--accent)}
-
-/* ---------- hero ---------- */
-.hero{
-  min-height:100vh;min-height:100svh;padding:118px var(--pad) 0;
-  display:flex;flex-direction:column;justify-content:space-between;position:relative;
-}
-.hero-top{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;
-  border-bottom:1px solid var(--line);padding-bottom:16px}
-.hero-mid{padding:clamp(28px,6vh,72px) 0;flex:1;display:flex;flex-direction:column;justify-content:center}
-.bigname{
-  font-family:var(--serif);font-weight:400;
-  font-size:clamp(3.6rem,15.5vw,15rem);line-height:.86;letter-spacing:-.025em;
-}
-.bigname .ln{display:block;overflow:hidden}
-.bigname .ln>span{display:block;transform:translateY(105%);
-  transition:transform 1.15s var(--ease)}
-.loaded .bigname .ln>span{transform:none}
-.bigname .ln:nth-child(2)>span{transition-delay:.11s}
-.bigname .idx{
-  font-size:.13em;vertical-align:super;letter-spacing:.1em;color:var(--accent);
-  font-family:var(--sans);font-weight:400;
-}
-.hero-sub{
-  display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;
-  margin-top:clamp(26px,5vh,54px);
-  opacity:0;transform:translateY(16px);transition:opacity .9s .5s var(--ease),transform .9s .5s var(--ease);
-}
-.loaded .hero-sub{opacity:1;transform:none}
-.hero-state{font-family:var(--serif);font-size:clamp(1.3rem,3.1vw,2.15rem);line-height:1.22;max-width:19ch}
-.hero-right{text-align:right;display:flex;flex-direction:column;gap:7px;align-items:flex-end}
-.hero-right .val{font-family:var(--serif);font-size:1.15rem;line-height:1.25}
-.scrollcue{
-  display:flex;align-items:center;gap:11px;padding:18px 0 22px;
-  opacity:0;transition:opacity .9s .8s;
-}
-.loaded .scrollcue{opacity:1}
-.scrollcue .bar{width:1px;height:34px;background:var(--line);position:relative;overflow:hidden}
-.scrollcue .bar::after{content:'';position:absolute;inset:0;background:var(--accent);
-  animation:drop 2.1s var(--ease) infinite}
-@keyframes drop{0%{transform:translateY(-100%)}55%,100%{transform:translateY(100%)}}
-
-/* ---------- marquee ---------- */
-.marq{
-  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-  padding:16px 0;overflow:hidden;white-space:nowrap;background:var(--paper);
-}
-.marq-in{display:inline-flex;animation:slide 38s linear infinite;will-change:transform}
-.marq:hover .marq-in{animation-play-state:paused}
-.marq span{
-  font-family:var(--serif);font-size:clamp(1.15rem,2.4vw,1.9rem);
-  padding:0 30px;display:inline-flex;align-items:center;gap:30px;
-}
-.marq span::after{content:'✳';font-size:.5em;color:var(--accent);font-family:var(--sans)}
-@keyframes slide{to{transform:translateX(-50%)}}
-
-/* ---------- affiliations band ---------- */
-.affil{padding:clamp(44px,7vh,78px) var(--pad);border-bottom:1px solid var(--line)}
-.affil-row{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));
-  gap:clamp(24px,3.4vw,46px);margin-top:30px;
-}
-.affil-item{padding-top:20px;border-top:1px solid var(--line);position:relative}
-.affil-item::after{content:'';position:absolute;left:0;top:-1px;height:2px;width:0;
-  background:var(--accent);transition:width .55s var(--ease)}
-.affil-item:hover::after{width:100%}
-.a-tag{display:block;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:10px}
-.a-tag.past{color:var(--ink-3)}
-.am{display:block;font-family:var(--serif);font-size:clamp(1.65rem,4vw,2.8rem);
-  line-height:.98;letter-spacing:-.028em}
-.as{display:block;margin-top:11px;font-size:.66rem;letter-spacing:.17em;
-  text-transform:uppercase;color:var(--ink-3);line-height:1.7}
-
-/* ---------- sections ---------- */
-section{padding:clamp(78px,12vh,150px) var(--pad)}
-.lbl{
-  display:flex;align-items:baseline;gap:14px;margin-bottom:44px;
-}
-.lbl::after{content:'';flex:1;height:1px;background:var(--line)}
+/* gradient-filled display type — the fill drifts continuously */
+.shead .nm{font-family:var(--mono);font-size:.64rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--fg2)}
+.big{font-family:var(--serif);font-weight:400;letter-spacing:-.025em;line-height:1.04}
+.lede{font-family:var(--serif);font-size:clamp(1.5rem,3.9vw,2.9rem);line-height:1.17;
+  letter-spacing:-.014em}
+.lede em{color:var(--sa)}
+.body2{color:var(--fg2);font-size:1rem;line-height:1.74}
+.body2 strong{color:var(--fg);font-weight:500}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:clamp(22px,3vw,40px)}
+.cols2 p+p{margin-top:14px}
 
 /* reveal */
-.rv{opacity:0;transform:translateY(26px);transition:opacity .95s var(--ease),transform .95s var(--ease)}
+.rv{opacity:0;transform:translateY(28px);transition:opacity 1s var(--ez),transform 1s var(--ez)}
 .rv.in{opacity:1;transform:none}
 .rw{display:inline-block;overflow:hidden;vertical-align:top}
-.rw>i,.rw>b{display:inline-block;font-style:inherit;font-weight:inherit;
-  transform:translateY(102%);transition:transform .85s var(--ease)}
-.in .rw>i,.in .rw>b{transform:none}
+.rw>b{display:inline-block;font-weight:inherit;transform:translateY(103%);
+  transition:transform .9s var(--ez)}
+.in .rw>b{transform:none}
 
-/* ---------- about ---------- */
-.about-grid{display:grid;grid-template-columns:minmax(140px,.9fr) 3.1fr;gap:clamp(28px,6vw,90px);align-items:start}
-.about-stick{position:sticky;top:104px}
-.stmt{
-  font-family:var(--serif);font-size:clamp(1.65rem,4.1vw,3.05rem);line-height:1.16;
-  letter-spacing:-.012em;margin-bottom:52px;
+/* if background-clip:text is unsupported, never render invisible text */
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .grad{background:none !important;color:var(--fg) !important}
 }
-.stmt em{color:var(--accent)}
-.about-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:34px}
-.about-cols p{color:var(--ink-2);font-size:1rem;line-height:1.72}
-.about-cols p+p{margin-top:15px}
-.about-cols strong{font-weight:500;color:var(--ink)}
-.facts{margin-top:60px;border-top:1px solid var(--line)}
-.fact{display:grid;grid-template-columns:minmax(90px,.5fr) 2fr auto;gap:20px;
-  padding:19px 0;border-bottom:1px solid var(--line);align-items:baseline}
-.fact .f-deg{font-family:var(--serif);font-size:1.22rem;line-height:1.3}
-.fact .f-inst{color:var(--ink-2);font-size:.92rem}
-.fact .f-val{font-family:var(--serif);font-size:1.22rem;color:var(--accent);white-space:nowrap}
+/* ═══════════════ HERO ═══════════════ */
+#hero{position:relative;min-height:100vh;min-height:100svh;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:clamp(94px,13vh,132px) var(--pad) clamp(104px,15vh,148px);
+  overflow:hidden;z-index:2}
+#eegBg{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.26}
+html[data-theme="instrument"] #eegBg{opacity:.38}
+/* scrim keeps the headline legible over live signal */
+#hero::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none}
+html[data-theme="instrument"] #hero::after{
+  background:radial-gradient(ellipse 78% 62% at 26% 46%,
+    rgba(7,8,10,.95) 0%, rgba(7,8,10,.80) 36%, rgba(7,8,10,.34) 66%, rgba(7,8,10,0) 100%)}
+html[data-theme="paper"] #hero::after{
+  background:radial-gradient(ellipse 78% 62% at 26% 46%,
+    rgba(242,238,231,.95) 0%, rgba(242,238,231,.80) 36%, rgba(242,238,231,.34) 66%, rgba(242,238,231,0) 100%)}
+#hero>*:not(#eegBg){position:relative;z-index:2}
+.h-top{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  border-bottom:1px solid var(--line);padding-bottom:14px}
+.h-mid{flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(26px,5vh,60px) 0}
+#bigName{font-size:clamp(3.1rem,15vw,14.5rem);line-height:.84}
+#bigName .ln{display:block;overflow:hidden}
+/* Entrance is a pure CSS animation with fill-mode both: it completes even if
+   JS throws or the tab is throttled, so the hero can never render blank. */
+#bigName .ln>span{display:block;animation:rise 1.25s var(--ez) both}
+#bigName .ln:nth-child(2)>span{animation-delay:.13s}
+@keyframes rise{from{transform:translateY(106%)}to{transform:none}}
+#bigName sup{font-family:var(--mono);font-size:.082em;vertical-align:super;
+  letter-spacing:.14em;color:var(--acc);font-weight:500}
+.h-sub{display:flex;justify-content:space-between;align-items:flex-end;
+  gap:clamp(22px,4vw,56px);flex-wrap:wrap;margin-top:clamp(22px,4vh,46px);
+  animation:fadeup 1s .5s var(--ez) both}
+@keyframes fadeup{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.h-q{font-family:var(--serif);font-size:clamp(1.22rem,2.9vw,2.05rem);
+  line-height:1.24;max-width:21ch}
+.h-q em{color:var(--acc2)}
+.h-meta{display:flex;flex-direction:column;gap:6px;text-align:right;align-items:flex-end;
+  font-family:var(--mono);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--fg3)}
+.h-meta .v{font-family:var(--serif);font-size:1.1rem;letter-spacing:0;
+  text-transform:none;color:var(--fg);line-height:1.26}
+.h-meta .hl{color:var(--acc)}
+/* live band readout */
+.bands{display:flex;gap:clamp(8px,1.4vw,20px);align-items:flex-end;flex-wrap:wrap}
+.band{display:flex;flex-direction:column;gap:6px;min-width:46px}
+.band .bl{font-family:var(--mono);font-size:.56rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--fg3)}
+.band .bb{height:34px;width:100%;background:var(--line);position:relative;overflow:hidden}
+.band .bb i{position:absolute;left:0;right:0;bottom:0;height:12%;
+  transition:height .13s linear}
+.band:nth-child(1) .bb i{background:linear-gradient(180deg,#22F0C8,#0E9E86)}
+.band:nth-child(2) .bb i{background:linear-gradient(180deg,#2FC4FF,#1569B8)}
+.band:nth-child(3) .bb i{background:linear-gradient(180deg,#B07CFF,#6A3FC0)}
+.band:nth-child(4) .bb i{background:linear-gradient(180deg,#FF4FD8,#B01A8E)}
+.band:nth-child(5) .bb i{background:linear-gradient(180deg,#FFC234,#D1700F)}
+.band .bb{box-shadow:inset 0 0 0 1px var(--line)}
+.band .bv{font-family:var(--mono);font-size:.56rem;color:var(--fg2);letter-spacing:.06em}
+.cue,.bands{animation:fadein 1s .8s var(--ez) both}
+.cue{display:flex;align-items:center;gap:11px}
+.cue .bar{width:1px;height:32px;background:var(--line);position:relative;overflow:hidden}
+.cue .bar::after{content:'';position:absolute;inset:0;background:var(--acc);
+  animation:drp 2.2s var(--ez) infinite}
+@keyframes drp{0%{transform:translateY(-100%)}55%,100%{transform:translateY(100%)}}
 
-/* ---------- research direction ---------- */
-.prop{
-  margin-bottom:clamp(40px,6vh,64px);padding:26px 0 0;border-top:1px solid var(--ink);
-}
-.prop .p-lab{display:block;font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:14px}
-.prop .p-ttl{font-family:var(--serif);font-size:clamp(1.4rem,3.2vw,2.2rem);
-  line-height:1.16;letter-spacing:-.015em;max-width:30ch}
-.threads{display:grid;grid-template-columns:repeat(auto-fit,minmax(275px,1fr));
-  gap:clamp(30px,4vw,52px);margin-top:clamp(44px,6vh,70px)}
-.thread{border-top:1px solid var(--ink);padding-top:22px}
-.t-n{display:block;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:14px}
-.thread h3{font-family:var(--serif);font-weight:400;
-  font-size:clamp(1.35rem,2.5vw,1.85rem);line-height:1.16;letter-spacing:-.015em;margin-bottom:14px}
-.thread p{color:var(--ink-2);font-size:.93rem;line-height:1.68}
-.t-q{
-  display:block;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);
-  font-family:var(--serif);font-style:italic;font-size:1.02rem;line-height:1.44;color:var(--ink);
-}
-.seeking{
-  margin-top:clamp(52px,8vh,90px);padding-top:26px;border-top:1px solid var(--ink);
-  display:flex;justify-content:space-between;gap:26px;flex-wrap:wrap;align-items:baseline;
-}
-.seeking .s-v{font-family:var(--serif);font-size:clamp(1.25rem,2.9vw,2rem);
-  line-height:1.2;letter-spacing:-.015em;max-width:34ch}
-.seeking .s-v em{color:var(--accent)}
+/* ═══════════════ AFFILIATIONS ═══════════════ */
+.aff{padding:clamp(42px,7vh,78px) var(--pad);border-bottom:1px solid var(--line);
+  position:relative;z-index:2}
+.aff-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));
+  gap:clamp(20px,3vw,42px);margin-top:26px}
+.aff-i{padding-top:18px;border-top:1px solid var(--line);position:relative}
+.cap-g{position:relative}
+.aff-m{color:var(--fg);transition:color .4s var(--ez)}
+.aff-i:hover .aff-m{color:var(--sa)}
+.aff-i::after{content:'';position:absolute;left:0;top:-1px;height:2px;width:0;
+  background:var(--sa);transition:width .6s var(--ez)}
+.aff-i:hover::after{width:100%}
+.aff-t{display:block;font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--sa);margin-bottom:9px}
+.aff-t.pa{color:var(--fg3)}
+.aff-m{display:block;font-family:var(--serif);font-size:clamp(1.5rem,3.7vw,2.6rem);
+  line-height:1;letter-spacing:-.028em}
+.aff-s{display:block;margin-top:9px;font-family:var(--mono);font-size:.58rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--fg3);line-height:1.72}
 
-/* ---------- experience ---------- */
+/* ═══════════════ SUBJECT / FACTS ═══════════════ */
+.grid-ab{display:grid;grid-template-columns:minmax(130px,.8fr) 3.2fr;
+  gap:clamp(24px,5vw,80px);align-items:start}
+.stick{position:sticky;top:96px}
+.facts{margin-top:clamp(36px,5vh,58px);border-top:1px solid var(--line)}
+.fct{display:grid;grid-template-columns:minmax(86px,.5fr) 2fr auto;gap:18px;
+  padding:17px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.fct .d{font-family:var(--serif);font-size:1.16rem;line-height:1.3}
+.fct .i{color:var(--fg2);font-size:.9rem}
+.fct .v{font-family:var(--serif);font-size:1.16rem;color:var(--sa);white-space:nowrap}
+
+/* ═══════════════ HYPOTHESIS / PROPOSAL ═══════════════ */
+.prop{margin:clamp(34px,5vh,56px) 0;padding:24px 0 0;border-top:1px solid var(--fg)}
+.prop .pl{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--sa);margin-bottom:12px}
+.prop .pt{font-family:var(--serif);font-size:clamp(1.34rem,3.1vw,2.15rem);
+  line-height:1.17;letter-spacing:-.016em;max-width:31ch}
+
+/* identifiability lab */
+.lab{margin-top:clamp(40px,6vh,72px);border:1px solid var(--line2);
+  background:var(--panel);position:relative;overflow:hidden}
+.lab-hd{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  padding:14px 18px;border-bottom:1px solid var(--line2);background:var(--panel2);
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--fg3)}
+.lab-hd .t{color:var(--fg)}
+.lab-bd{display:grid;grid-template-columns:1.25fr .95fr}
+.lab-stage{position:relative;border-right:1px solid var(--line2);min-height:400px;background:#05070D;
+  touch-action:none;cursor:crosshair}
+.lab-stage canvas{width:100%;height:100%;position:absolute;inset:0}
+.lab-side{padding:18px;display:flex;flex-direction:column;gap:17px}
+.rdo{border:1px solid var(--line);padding:13px 14px;background:var(--bg2)}
+.rdo .k{font-family:var(--mono);font-size:.56rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--fg3);display:block;margin-bottom:7px}
+.rdo .n{font-family:var(--mono);font-size:clamp(1.35rem,3.1vw,2.1rem);
+  font-weight:500;line-height:1;letter-spacing:-.02em;color:var(--fg)}
+.rdo .n.good{color:var(--acc2)} .rdo .n.warn{color:var(--acc3)} .rdo .n.bad{color:var(--acc)}
+.verdict{border:1px solid var(--line2);padding:14px;text-align:center;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
+  font-weight:500;transition:all .35s}
+.verdict.ok{color:#22F0C8;border-color:#22F0C8;background:rgba(34,240,200,.10)}
+.verdict.no{color:#FF4A22;border-color:#FF4A22;background:rgba(255,74,34,.12)}
+.sld{display:flex;flex-direction:column;gap:8px}
+.sld label{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--fg3);display:flex;justify-content:space-between;gap:10px}
+.sld label b{color:var(--acc2);font-weight:500}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:2px;
+  background:var(--line2);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;
+  border-radius:50%;background:var(--acc);cursor:grab;border:2px solid var(--bg)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;
+  background:var(--acc);cursor:grab;border:2px solid var(--bg)}
+.lab-note{font-family:var(--mono);font-size:.56rem;letter-spacing:.09em;line-height:1.75;
+  color:var(--fg3);text-transform:none;padding:12px 18px;border-top:1px solid var(--line2);
+  background:var(--bg2)}
+.lab-note b{color:var(--fg2);font-weight:400}
+
+/* ═══════════════ RECORD / EXPERIENCE ═══════════════ */
 .xp{border-top:1px solid var(--line)}
-.xrow{border-bottom:1px solid var(--line);position:relative;overflow:hidden}
-.xrow::before{content:'';position:absolute;inset:0;background:var(--paper-2);
-  transform:scaleY(0);transform-origin:bottom;transition:transform .5s var(--ease);z-index:0}
-.xrow:hover::before{transform:scaleY(1);transform-origin:top}
-.xhead{position:relative;z-index:1;display:grid;
-  grid-template-columns:auto 1fr auto auto;gap:clamp(16px,3vw,44px);
-  align-items:start;padding:38px 0 34px;cursor:pointer;
-  transition:padding-left .5s var(--ease)}
-.xrow:hover .xhead{padding-left:20px}
-.xhead>.xnum,.xhead>.xdate{padding-top:.5em}
-.xnum{font-family:var(--serif);font-size:.95rem;color:var(--accent);min-width:26px}
-.xorg-big{
-  display:block;font-family:var(--serif);font-weight:400;
-  font-size:clamp(2.05rem,6.1vw,4.35rem);line-height:.94;letter-spacing:-.028em;
-  transition:color .4s var(--ease);
-}
-.xrow:hover .xorg-big{color:var(--accent)}
-.xorg-full{
-  display:block;margin-top:11px;font-size:.72rem;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--ink-3);
-}
-.xrole{
-  display:block;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
-  font-family:var(--serif);font-size:clamp(1.05rem,2.1vw,1.45rem);
-  line-height:1.25;color:var(--ink);max-width:46ch;
-}
-.xplace{display:block;margin-top:6px;color:var(--ink-2);font-size:.88rem;max-width:62ch}
-.xdate{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
-.xnow{display:inline-flex;align-items:center;gap:7px;color:var(--accent)}
-.xnow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);
-  animation:pulse 2.4s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.72)}}
-.xbody{position:relative;z-index:1;max-height:0;overflow:hidden;
-  transition:max-height .65s var(--ease)}
-.xrow.open .xbody{max-height:1100px}
-.xbody-in{padding:0 0 32px clamp(0px,3vw,44px);display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px 44px;max-width:1100px}
-.xbody-in p{color:var(--ink-2);font-size:.94rem;line-height:1.66;
-  padding-left:18px;position:relative}
-.xbody-in p::before{content:'';position:absolute;left:0;top:.66em;width:8px;height:1px;background:var(--accent)}
-.xtoggle{position:relative;z-index:1;width:15px;height:15px;flex:none;align-self:center}
-.xtoggle::before,.xtoggle::after{content:'';position:absolute;background:var(--ink);
-  transition:transform .45s var(--ease),background .3s}
-.xtoggle::before{top:7px;left:0;width:15px;height:1px}
-.xtoggle::after{left:7px;top:0;width:1px;height:15px}
-.xrow.open .xtoggle::after{transform:rotate(90deg)}
-.xrow.open .xtoggle::before{background:var(--accent)}
+.xr{border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.xr::before{content:'';position:absolute;inset:0;z-index:0;
+  background:var(--panel);
+  background:linear-gradient(100deg,color-mix(in srgb,var(--sa) 13%,var(--panel)),var(--panel) 62%);
+  transform:scaleY(0);transform-origin:bottom;transition:transform .55s var(--ez)}
+.xr:hover::before{transform:scaleY(1);transform-origin:top}
+.xh{position:relative;z-index:1;display:grid;grid-template-columns:auto 1fr auto auto;
+  gap:clamp(14px,2.6vw,40px);align-items:start;padding:34px 0 30px;cursor:pointer;
+  transition:padding-left .55s var(--ez)}
+.xr:hover .xh{padding-left:18px}
+.xh>.xn,.xh>.xd{padding-top:.5em}
+.xn{font-family:var(--mono);font-size:.68rem;color:var(--sa);min-width:24px}
+.xo{display:block;font-family:var(--serif);font-size:clamp(1.9rem,5.8vw,4.1rem);
+  line-height:.95;letter-spacing:-.028em;transition:color .4s var(--ez)}
+.xr:hover .xo{color:var(--sa)}
+.xf{display:block;margin-top:10px;font-family:var(--mono);font-size:.6rem;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--fg3)}
+.xrl{display:block;margin-top:14px;padding-top:13px;border-top:1px solid var(--line);
+  font-family:var(--serif);font-size:clamp(1.02rem,2vw,1.4rem);line-height:1.26;max-width:48ch}
+.xpl{display:block;margin-top:6px;color:var(--fg2);font-size:.86rem;max-width:64ch}
+.xd{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--fg3);white-space:nowrap}
+.now{display:inline-flex;align-items:center;gap:6px;color:var(--sa)}
+.now::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--sa);
+  animation:pls 2.3s ease-in-out infinite}
+@keyframes pls{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+.xb{position:relative;z-index:1;max-height:0;overflow:hidden;transition:max-height .7s var(--ez)}
+.xr.open .xb{max-height:1200px}
+.xbi{padding:0 0 30px clamp(0px,2.6vw,40px);display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:11px 40px;max-width:1120px}
+.xbi p{color:var(--fg2);font-size:.92rem;line-height:1.68;padding-left:17px;position:relative}
+.xbi p::before{content:'';position:absolute;left:0;top:.66em;width:8px;height:1px;background:var(--sa)}
+.xbi p strong{color:var(--fg);font-weight:500}
+.xt{position:relative;z-index:1;width:14px;height:14px;flex:none;align-self:center}
+.xt::before,.xt::after{content:'';position:absolute;background:var(--fg2);
+  transition:transform .5s var(--ez),background .3s}
+.xt::before{top:6.5px;left:0;width:14px;height:1px}
+.xt::after{left:6.5px;top:0;width:1px;height:14px}
+.xr.open .xt::after{transform:rotate(90deg)}
+.xr.open .xt::before{background:var(--sa)}
 
-/* ---------- horizontal work ---------- */
-.work-intro{padding-bottom:0}
-.hwrap{position:relative;padding:0}
-.hstick{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:flex;align-items:center}
-.htrack{display:flex;align-items:stretch;gap:26px;padding:0 var(--pad);will-change:transform}
-.panel{
-  width:clamp(300px,44vw,530px);flex:none;
-  border-top:1px solid var(--ink);padding-top:24px;
-  display:flex;flex-direction:column;
-}
-.p-top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:20px}
-.p-num{font-family:var(--serif);font-size:clamp(2.6rem,5.4vw,4.4rem);line-height:.8;letter-spacing:-.03em}
-.p-num sup{font-size:.17em;vertical-align:super;color:var(--accent);letter-spacing:.14em;
-  font-family:var(--sans);font-weight:400;margin-left:5px}
-.p-title{font-family:var(--serif);font-size:clamp(1.35rem,2.6vw,2rem);line-height:1.14;
-  letter-spacing:-.012em;margin-bottom:18px;max-width:22ch}
-.p-body{flex:1}
-.p-body p{color:var(--ink-2);font-size:.9rem;line-height:1.62;padding-left:17px;position:relative}
-.p-body p+p{margin-top:9px}
-.p-body p::before{content:'';position:absolute;left:0;top:.68em;width:7px;height:1px;background:var(--accent)}
-.p-tags{margin:22px 0 18px;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;
-  color:var(--ink-3);line-height:1.9}
-.p-tags b{font-weight:400}
-.p-tags b+b::before{content:' / ';color:var(--line)}
-.p-link{display:inline-flex;align-items:center;gap:10px;font-size:.72rem;letter-spacing:.17em;
-  text-transform:uppercase;color:var(--ink);align-self:flex-start;padding-bottom:5px;
-  border-bottom:1px solid var(--ink);transition:color .3s,border-color .3s,gap .3s var(--ease)}
-.p-link:hover{color:var(--accent);border-color:var(--accent);gap:17px}
-.p-link span{transition:transform .3s var(--ease)}
-.p-status{font-size:.68rem;letter-spacing:.17em;text-transform:uppercase;
-  color:var(--ink-3);align-self:flex-start;padding-bottom:5px;border-bottom:1px solid var(--line)}
-.divider{
-  width:clamp(140px,15vw,200px);flex:none;position:relative;
-  border-top:1px solid transparent;
-}
-.divider .d-in{
-  position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%) rotate(-90deg);transform-origin:center;
-  white-space:nowrap;
-  font-family:var(--serif);font-size:clamp(1.1rem,2vw,1.6rem);color:var(--accent);
-  display:flex;align-items:center;gap:14px}
-.divider .d-in::before{content:'';width:44px;height:1px;background:var(--accent)}
-.hprog{position:absolute;left:var(--pad);right:var(--pad);bottom:34px;height:1px;background:var(--line)}
-.hprog i{position:absolute;left:0;top:-1px;height:3px;width:0;background:var(--accent);transition:width .12s linear}
-.hhint{position:absolute;right:var(--pad);bottom:48px;display:flex;align-items:center;gap:10px}
+/* ═══════════════ HORIZONTAL INSTRUMENTS ═══════════════ */
+.hw{position:relative;z-index:2}
+.hs{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;
+  display:flex;align-items:center}
+.ht{display:flex;align-items:stretch;gap:20px;padding:0 var(--pad);will-change:transform}
+.pn{width:clamp(282px,40vw,470px);flex:none;display:flex;flex-direction:column;
+  border:1px solid var(--line);position:relative;
+  background:var(--panel);
+  background:linear-gradient(170deg,
+    color-mix(in srgb,var(--sa) 9%,var(--panel)) 0%, var(--panel) 46%);
+  transition:border-color .4s,transform .4s var(--ez),box-shadow .4s}
+.pn::before{content:'';position:absolute;left:-1px;right:-1px;top:-1px;height:2px;background:var(--acc);opacity:.75}
+.pn:hover{border-color:var(--line2);border-color:color-mix(in srgb,var(--sa) 52%,var(--line2));
+  transform:translateY(-5px)}
+.pn-t{color:var(--fg)}
+.pn-vis{height:clamp(120px,15vh,170px);border-bottom:1px solid var(--line);
+  position:relative;overflow:hidden;background:#05070D;flex:none}
+.pn-vis canvas{position:absolute;inset:0;width:100%;height:100%}
+.pn-vis .tag{position:absolute;left:10px;bottom:8px;font-family:var(--mono);
+  font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--fg3);
+  background:color-mix(in srgb,var(--bg) 72%,transparent);padding:2px 6px}
+.pn-in{padding:17px 18px 19px;display:flex;flex-direction:column;flex:1}
+.pn-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:13px}
+.pn-n{font-family:var(--serif);font-size:clamp(1.9rem,4vw,3rem);line-height:.8;letter-spacing:-.03em}
+.pn-n sup{font-family:var(--mono);font-size:.19em;vertical-align:super;color:var(--sa);
+  letter-spacing:.14em;margin-left:4px;font-weight:500}
+.pn-t{font-family:var(--serif);font-size:clamp(1.14rem,2.2vw,1.58rem);line-height:1.17;
+  letter-spacing:-.012em;margin-bottom:14px;max-width:24ch}
+.pn-b{flex:1}
+.pn-b p{color:var(--fg2);font-size:.84rem;line-height:1.62;padding-left:15px;position:relative}
+.pn-b p+p{margin-top:7px}
+.pn-b p::before{content:'';position:absolute;left:0;top:.68em;width:7px;height:1px;background:var(--sa)}
+.pn-b p strong{color:var(--fg);font-weight:500}
+.pn-g{margin:16px 0 14px;font-family:var(--mono);font-size:.56rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--fg3);line-height:1.9}
+.pn-g b{font-weight:400}
+.pn-g b+b::before{content:' / ';color:var(--line2)}
+.pn-l{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:.6rem;
+  letter-spacing:.17em;text-transform:uppercase;align-self:flex-start;padding-bottom:4px;
+  border-bottom:1px solid var(--fg2);transition:all .3s var(--ez)}
+.pn-l:hover{color:var(--sa);border-color:var(--sa);gap:15px}
+.pn-st{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--fg3);align-self:flex-start;padding-bottom:4px;border-bottom:1px solid var(--line2)}
+.dv{width:clamp(108px,11vw,150px);flex:none;position:relative}
+.dv-in{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-90deg);
+  white-space:nowrap;font-family:var(--serif);font-size:clamp(1rem,1.9vw,1.5rem);
+  color:var(--sa);display:flex;align-items:center;gap:13px}
+.dv-in::before{content:'';width:40px;height:1px;background:var(--sa)}
+.hbar{position:absolute;left:var(--pad);right:var(--pad);bottom:30px;height:1px;background:var(--line)}
+.hbar i{position:absolute;left:0;top:-1px;height:3px;width:0;background:var(--sa)}
+.hhint{position:absolute;right:var(--pad);bottom:44px}
 
-/* ---------- skills ---------- */
-.sk{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:44px 60px}
-.sk-g h3{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);
-  font-weight:400;margin-bottom:15px;padding-bottom:12px;border-bottom:1px solid var(--line)}
-.sk-g p{font-family:var(--serif);font-size:clamp(1.12rem,1.9vw,1.5rem);line-height:1.42;color:var(--ink)}
-.sk-g p span{color:var(--line);padding:0 4px}
+/* ═══════════════ BENCH ═══════════════ */
+.bench{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:clamp(18px,2.4vw,30px)}
+.bx{border:1px solid var(--line2);background:var(--panel);display:flex;flex-direction:column}
+.bx-hd{padding:12px 15px;border-bottom:1px solid var(--line2);background:var(--panel2);
+  display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.bx-hd .t{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--fg)}
+.bx-cv{height:clamp(150px,19vh,210px);position:relative;background:#05070D;flex:none}
+.bx-cv canvas{position:absolute;inset:0;width:100%;height:100%}
+.bx-bd{padding:15px;display:flex;flex-direction:column;gap:13px;flex:1}
+.bx-bd .cap{font-size:.84rem;color:var(--fg2);line-height:1.62}
+.bx-bd .cap strong{color:var(--fg);font-weight:500}
+.chip{font-family:var(--mono);font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;
+  padding:4px 9px;border:1px solid var(--line2);color:var(--fg3)}
+.chip.ok{color:var(--acc2);border-color:var(--acc2)}
+.chip.no{color:var(--acc);border-color:var(--acc)}
+.meter{height:5px;background:var(--line);position:relative;overflow:hidden}
+.meter i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--acc2);transition:width .18s linear}
+.meter i.hi{background:var(--sa)}
 
-/* ---------- lead ---------- */
-.lead{display:grid;grid-template-columns:minmax(140px,.9fr) 3.1fr;gap:clamp(28px,6vw,90px)}
-.lead h3{font-family:var(--serif);font-size:clamp(1.5rem,3.2vw,2.3rem);line-height:1.16;margin-bottom:9px}
-.lead .l-org{color:var(--accent);font-size:.9rem;margin-bottom:26px}
-.roles{border-top:1px solid var(--line);margin-bottom:28px}
-.role{display:grid;grid-template-columns:auto 1fr;gap:10px 22px;padding:14px 0;
+/* ═══════════════ CAPABILITIES ═══════════════ */
+.caps{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:clamp(26px,3.4vw,52px)}
+.cap-g h3{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--sa);font-weight:400;margin-bottom:13px;padding-bottom:11px;border-bottom:1px solid var(--line)}
+.cap-g p{font-family:var(--serif);font-size:clamp(1.06rem,1.8vw,1.42rem);line-height:1.44}
+.cap-g p span{color:var(--line2);padding:0 3px}
+
+/* ═══════════════ BEYOND ═══════════════ */
+.roles{border-top:1px solid var(--line);margin-bottom:24px}
+.role{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;padding:13px 0;
   border-bottom:1px solid var(--line);align-items:baseline}
-.role .r-n{font-family:var(--serif);font-size:.9rem;color:var(--accent)}
-.role .r-t{font-family:var(--serif);font-size:1.15rem;line-height:1.3}
-.role .r-d{color:var(--ink-2);font-size:.86rem;margin-top:3px}
-.lead p.li{color:var(--ink-2);font-size:.97rem;line-height:1.7;padding-left:19px;position:relative;max-width:70ch}
-.lead p.li+p.li{margin-top:12px}
-.lead p.li::before{content:'';position:absolute;left:0;top:.7em;width:9px;height:1px;background:var(--accent)}
+.role .rn{font-family:var(--mono);font-size:.64rem;color:var(--sa)}
+.role .rt{font-family:var(--serif);font-size:1.12rem;line-height:1.32}
+.role .rd{color:var(--fg2);font-size:.84rem;margin-top:3px}
+.li{color:var(--fg2);font-size:.95rem;line-height:1.72;padding-left:18px;
+  position:relative;max-width:72ch}
+.li+.li{margin-top:11px}
+.li::before{content:'';position:absolute;left:0;top:.72em;width:9px;height:1px;background:var(--sa)}
 
-/* ---------- contact ---------- */
-.contact{background:var(--ink);color:var(--paper);padding-bottom:clamp(46px,7vh,80px)}
-.contact .micro{color:#9d9382}
-.contact .lbl::after{background:#3a332a}
-.c-big{font-family:var(--serif);font-size:clamp(2.1rem,6.4vw,5.2rem);line-height:1.06;
-  letter-spacing:-.02em;margin-bottom:14px;max-width:16ch}
-.c-big em{color:#E8734F}
-.c-sub{color:#a9a08e;max-width:54ch;margin-bottom:clamp(40px,6vh,70px);font-size:1.02rem}
-.c-mail{
-  display:inline-block;font-family:var(--serif);
-  font-size:clamp(1.3rem,4.4vw,3.1rem);letter-spacing:-.015em;
-  border-bottom:1px solid #4a4237;padding-bottom:8px;
-  transition:color .35s,border-color .35s;word-break:break-word;
-}
-.c-mail:hover{color:#E8734F;border-color:#E8734F}
-.c-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:clamp(38px,6vh,64px)}
-.c-links a{
-  font-size:.72rem;letter-spacing:.17em;text-transform:uppercase;
-  border:1px solid #3a332a;border-radius:99px;padding:13px 25px;
-  transition:background .35s var(--ease),color .35s,border-color .35s;
-}
-.c-links a:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
-.foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
-  margin-top:clamp(56px,9vh,110px);padding-top:22px;border-top:1px solid #3a332a}
+/* ═══════════════ CONTACT ═══════════════ */
+#contact{background:var(--fg);color:var(--bg);position:relative;overflow:hidden}
+html[data-theme="instrument"] #contact{background:#EAE8E2;color:#07080A}
+html[data-theme="instrument"] #contact .mono{color:#5B6070}
+html[data-theme="instrument"] #contact .shead::after{background:#C9C6BE}
+html[data-theme="paper"] #contact{background:#17140F;color:#F2EEE7}
+html[data-theme="paper"] #contact .mono{color:#8B8071}
+html[data-theme="paper"] #contact .shead::after{background:#3A332A}
+.c-big{font-family:var(--serif);font-size:clamp(1.95rem,6vw,4.9rem);line-height:1.07;
+  letter-spacing:-.022em;margin-bottom:14px;max-width:17ch}
+.c-big em{color:var(--acc)}
+.c-sub{max-width:56ch;margin-bottom:clamp(34px,5vh,62px);font-size:1rem;opacity:.72}
+.c-mail{display:inline-block;font-family:var(--serif);
+  font-size:clamp(1.2rem,4.2vw,2.95rem);letter-spacing:-.016em;
+  border-bottom:1px solid currentColor;padding-bottom:7px;opacity:.95;
+  transition:color .35s,opacity .35s;word-break:break-word}
+.c-mail:hover{color:var(--acc);opacity:1}
+.c-ls{display:flex;flex-wrap:wrap;gap:10px;margin-top:clamp(32px,5vh,58px)}
+.c-ls a{font-family:var(--mono);font-size:.62rem;letter-spacing:.17em;text-transform:uppercase;
+  border:1px solid currentColor;border-radius:99px;padding:12px 22px;opacity:.6;
+  transition:opacity .3s,background .3s,color .3s}
+.c-ls a:hover{opacity:1;background:currentColor}
+.c-ls a:hover span{color:var(--bg)}
+html[data-theme="instrument"] #contact .c-ls a:hover span{color:#EAE8E2}
+html[data-theme="paper"] #contact .c-ls a:hover span{color:#17140F}
+.foot{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  margin-top:clamp(50px,8vh,100px);padding-top:20px;border-top:1px solid currentColor;opacity:.5}
 
-/* ---------- responsive / a11y ---------- */
-@media (hover:none),(pointer:coarse){.cur,.cur-ring{display:none}}
-@media (max-width:900px){
-  :root{--pad:22px}
-  .topnav{display:none}
-  .about-grid,.lead{grid-template-columns:1fr;gap:26px}
-  .about-stick{position:static}
-  .fact{grid-template-columns:1fr auto;gap:6px 16px}
-  .fact .f-inst{grid-column:1/-1;order:3}
-  .xhead{grid-template-columns:auto 1fr;row-gap:9px}
-  .xdate{grid-column:2}
-  .xtoggle{display:none}
-  .xrow .xbody{max-height:none}
-  .xbody-in{padding-left:0;padding-bottom:26px}
-  .hwrap{height:auto!important;padding:0 var(--pad)}
-  .hstick{position:static;height:auto;overflow:visible;display:block}
-  .htrack{flex-direction:column;gap:52px;padding:0;transform:none!important}
-  .panel{width:100%}
-  .divider{width:100%;padding-top:12px;height:auto}
-  .divider .d-in{position:static;transform:none}
-  .hprog,.hhint{display:none}
+/* ═══════════════ RESPONSIVE / A11Y ═══════════════ */
+@media (max-width:1100px){#montage{display:none}}
+@media (max-width:920px){
+  .lab-bd{grid-template-columns:1fr}
+  .lab-stage{border-right:none;border-bottom:1px solid var(--line2);min-height:330px}
+}
+@media (max-width:860px){
+  .grid-ab{grid-template-columns:1fr;gap:22px}
+  .stick{position:static}
+  .fct{grid-template-columns:1fr auto;gap:5px 14px}
+  .fct .i{grid-column:1/-1;order:3}
+  .xh{grid-template-columns:auto 1fr;row-gap:8px}
+  .xd{grid-column:2}
+  .xt{display:none}
+  .xr .xb{max-height:none}
+  .xbi{padding-left:0;padding-bottom:24px}
+  .hw{height:auto!important;padding:0 var(--pad)}
+  .hs{position:static;height:auto;overflow:visible;display:block}
+  .ht{flex-direction:column;gap:38px;padding:0;transform:none!important}
+  .pn{width:100%}
+  .dv{width:100%;height:auto;padding-top:10px}
+  .dv-in{position:static;transform:none}
+  .hbar,.hhint{display:none}
   .role{grid-template-columns:1fr}
+  .topnav{gap:12px;font-size:.72rem}
+}
+@media (max-width:560px){
+  .hud-tl .sig-nm{display:none}
+  .h-meta{text-align:left;align-items:flex-start}
+  .bands{gap:7px}
+  .band{min-width:38px}
 }
 @media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
   *{animation-duration:.01ms!important;animation-iteration-count:1!important;
     transition-duration:.01ms!important}
   .rv{opacity:1;transform:none}
-  .rw>i,.rw>b{transform:none}
-  .bigname .ln>span{transform:none}
-  .hero-sub,.scrollcue{opacity:1;transform:none}
-  .grain{animation:none}
-}
+  .rw>b{transform:none}
+  #bigName .ln>span{transform:none}
+  .h-sub{opacity:1;transform:none}
+  .fx-grain,}
 </style>
 </head>
 <body>
-<div class="grain" aria-hidden="true"></div>
-<div class="cur" aria-hidden="true"></div>
-<div class="cur-ring" aria-hidden="true"></div>
+<div class="fx fx-grain" aria-hidden="true"></div>
+<div class="fx fx-vig" aria-hidden="true"></div>
 
-<div class="topbar" id="topbar">
-  <a href="#top" class="nm">Abhranil Sarkar</a>
-  <nav class="topnav micro">
+<!-- ══════════ HUD ══════════ -->
+<div class="hud hud-tl" id="hudTop">
+  <a href="#hero" class="sig">
+    <span class="sig-mark" aria-hidden="true">
+      <svg viewBox="0 0 26 26" fill="none">
+        <circle cx="13" cy="13" r="11.4" stroke="var(--line2)" stroke-width="1"/>
+        <path id="sigTrace" d="M2 13 L26 13" stroke="var(--acc)" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span class="sig-nm">Abhranil Sarkar</span>
+  </a>
+  <nav class="topnav">
     <a href="#about">About</a>
     <a href="#research">Research</a>
     <a href="#experience">Experience</a>
     <a href="#work">Projects</a>
+    <a href="#bench">Demos</a>
     <a href="#contact">Contact</a>
+    <button class="btn" id="btnTheme" title="Switch colour scheme">Dark</button>
   </nav>
 </div>
 
-<!-- ============ HERO ============ -->
-<header class="hero" id="top">
-  <div class="hero-top micro">
-    <span>Final-year B.Tech — Electronics &amp; Biomedical Engineering</span>
-    <span>Portfolio — MMXXVI</span>
+<!-- ══════════ MONTAGE NAV ══════════ -->
+<nav id="montage" aria-label="Section navigation">
+  <div id="montageTip"></div>
+  <svg viewBox="0 0 100 112" role="list">
+    <circle class="el-ring" cx="50" cy="56" r="42"/>
+    <circle class="el-ring" cx="50" cy="56" r="29" opacity=".55"/>
+    <path class="el-ring" d="M50 14 l-5.5 -8 h11 z" opacity=".8"/>
+    <g id="montageDots"></g>
+  </svg>
+</nav>
+
+<!-- ══════════ 00 ACQUISITION ══════════ -->
+<header id="hero" data-sec="00 / Acquisition" data-el="Fp1">
+  <canvas id="eegBg" aria-hidden="true"></canvas>
+
+  <div class="h-top mono">
+    <span>Final-year B.Tech — Electronics &amp; Communication (Biomedical) · VIT Vellore</span>
+    <span>Rec. MMXXVI</span>
   </div>
 
-  <div class="hero-mid">
-    <h1 class="bigname">
+  <div class="h-mid">
+    <h1 class="big" id="bigName">
       <span class="ln"><span>Abhranil</span></span>
-      <span class="ln"><span>Sarkar<sup class="idx">01</sup></span></span>
+      <span class="ln"><span>Sarkar</span></span>
     </h1>
 
-    <div class="hero-sub">
-      <p class="hero-state">What a measurement can <em>actually recover</em> about the brain.</p>
-      <div class="hero-right">
-        <span class="micro">Incoming — Research Attachment</span>
-        <span class="val">A*STAR — Institute of Advanced Intelligence and Computing</span>
-        <span class="micro">EEG Manifold Representations for Cognition<br>Singapore · from Dec 2026</span>
-        <span class="micro" style="margin-top:14px;color:var(--accent)">Seeking direct PhD — Fall 2027</span>
+    <div class="h-sub">
+      <p class="h-q">What a measurement can <em>actually recover</em> about the brain.</p>
+      <div class="h-meta">
+        <span>Research attachment · from 07 Dec 2026</span>
+        <span class="v">A*STAR — Institute of Advanced<br>Intelligence and Computing</span>
+        <span>EEG Manifold Representations for Cognition · Singapore</span>
+        <span class="hl" style="margin-top:10px">Seeking direct PhD — Fall 2027</span>
       </div>
     </div>
   </div>
 
-  <div class="scrollcue">
-    <span class="bar"></span>
-    <span class="micro">Scroll</span>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:26px;flex-wrap:wrap">
+    <div class="cue">
+      <span class="bar"></span>
+      <span class="mono">Scroll to acquire</span>
+    </div>
+    <div class="bands" id="bandsRd" aria-hidden="true"></div>
   </div>
 </header>
 
-<div class="marq" aria-hidden="true">
-  <div class="marq-in">
-    <span>Neural Signal Processing</span><span>Computational Neuroscience</span><span>EEG Decoding</span>
-    <span>Biomedical Optics</span><span>Embedded Systems</span><span>Edge AI</span>
-    <span>Neural Signal Processing</span><span>Computational Neuroscience</span><span>EEG Decoding</span>
-    <span>Biomedical Optics</span><span>Embedded Systems</span><span>Edge AI</span>
-  </div>
-</div>
-
-<!-- ============ AFFILIATIONS ============ -->
-<div class="affil rv">
-  <span class="micro">Research affiliations</span>
-  <div class="affil-row">
-    <div class="affil-item">
-      <span class="a-tag">Incoming · Dec 2026</span>
-      <span class="am">A*STAR</span>
-      <span class="as">Institute of Advanced Intelligence and Computing<br>Singapore</span>
+<!-- ══════════ AFFILIATIONS ══════════ -->
+<div class="aff rv">
+  <span class="mono">Research affiliations</span>
+  <div class="aff-row">
+    <div class="aff-i">
+      <span class="aff-t">Incoming · Dec 2026</span>
+      <span class="aff-m">A*STAR</span>
+      <span class="aff-s">Institute of Advanced Intelligence<br>and Computing · Singapore</span>
     </div>
-    <div class="affil-item">
-      <span class="a-tag past">Former · 2026</span>
-      <span class="am">ISRO</span>
-      <span class="as">Human Space Flight Centre<br>Biomedical Engineering Division</span>
+    <div class="aff-i">
+      <span class="aff-t pa">Former · 2026</span>
+      <span class="aff-m">ISRO</span>
+      <span class="aff-s">Human Space Flight Centre<br>Biomedical Engineering Division</span>
     </div>
-    <div class="affil-item">
-      <span class="a-tag past">Former · 2025</span>
-      <span class="am">CSIR&#8203;-CMERI</span>
-      <span class="as">Central Mechanical Engineering<br>Research Institute, Durgapur</span>
+    <div class="aff-i">
+      <span class="aff-t pa">Former · 2025</span>
+      <span class="aff-m">CSIR&#8203;-CMERI</span>
+      <span class="aff-s">Central Mechanical Engineering<br>Research Institute · Durgapur</span>
     </div>
-    <div class="affil-item">
-      <span class="a-tag past">2023 — 2027</span>
-      <span class="am">VIT</span>
-      <span class="as">Vellore Institute of Technology<br>B.Tech ECE — Biomedical</span>
+    <div class="aff-i">
+      <span class="aff-t pa">2023 — 2027</span>
+      <span class="aff-m">VIT</span>
+      <span class="aff-s">Vellore Institute of Technology<br>B.Tech ECE — Biomedical</span>
     </div>
   </div>
 </div>
 
-<!-- ============ ABOUT ============ -->
-<section id="about">
-  <div class="about-grid">
-    <div class="about-stick">
-      <div class="lbl"><span class="micro">Ⅰ — About</span></div>
+<!-- ══════════ 01 SUBJECT ══════════ -->
+<section class="sec" id="about" data-sec="01 / Subject" data-el="F3">
+  <div class="grid-ab">
+    <div class="stick">
+      <div class="shead"><span class="idn">01</span><span class="nm">Subject</span></div>
     </div>
     <div>
-      <p class="stmt rv" data-split>I build the instruments that listen to the body — and I test <em>how much they can honestly tell us.</em></p>
+      <p class="lede rv" data-split>I build the instruments that listen to the body — and I test <em>how much they can honestly tell us.</em></p>
 
-      <div class="about-cols rv">
+      <div class="cols2 body2 rv" style="margin-top:clamp(30px,4vh,50px)">
         <div>
-          <p>I'm a final-year Electronics &amp; Communication Engineering student at <strong>VIT Vellore</strong>, specialising in Biomedical Engineering. My work runs from the sensing circuit up through real-time conditioning to the model that interprets the waveform — and, increasingly, to the question of what such a model is genuinely entitled to claim.</p>
-          <p>From December 2026 I join <strong>A*STAR's Institute of Advanced Intelligence and Computing</strong> in Singapore for a research attachment under Dr. Phua Kok Soon and Koh Tze Hui, asking whether wet-electrode EEG recorded from other people can reduce the calibration a new user needs on a dry-electrode headband.</p>
+          <p>I'm a final-year Electronics &amp; Communication Engineering student at <strong>VIT Vellore</strong>, specialising in Biomedical Engineering. My work runs from the sensing circuit, up through real-time conditioning, to the model that interprets the waveform — and, increasingly, to the question of what such a model is actually entitled to claim.</p>
+          <p>From December 2026 I join <strong>A*STAR's Institute of Advanced Intelligence and Computing</strong> in Singapore under Dr. Phua Kok Soon and Koh Tze Hui, asking whether wet-electrode EEG recorded from other people can reduce the calibration a new user needs on a dry-electrode headband.</p>
         </div>
         <div>
-          <p>Earlier this year at <strong>ISRO's Human Space Flight Centre</strong> I built a cross-modal EEG/ECG reconstruction framework in the Biomedical Engineering Division. It worked within cohort and then failed to generalise across subjects — a negative result that turned out to be the most useful thing I have produced, and the reason the Singapore project exists.</p>
-          <p>Before that, <strong>CSIR-CMERI Durgapur</strong> under Dr. Soumen Mandal, and an embedded-systems placement in industrial predictive maintenance. Alongside those, a line of work in <strong>diffuse optics and forward modelling</strong> of near-infrared light transport in cortical tissue.</p>
+          <p>Earlier this year at <strong>ISRO's Human Space Flight Centre</strong> I built a cross-modal EEG/ECG reconstruction framework in the Biomedical Engineering Division. It worked within cohort, then failed to generalise across subjects — a negative result that turned out to be the most useful thing I have produced, and the reason the Singapore project exists.</p>
+          <p>Before that, <strong>CSIR-CMERI Durgapur</strong> under Dr. Soumen Mandal, and an embedded placement in industrial predictive maintenance. Running alongside, a line of work in <strong>diffuse optics</strong> and the forward modelling of near-infrared light transport in cortical tissue.</p>
         </div>
       </div>
 
       <div class="facts rv">
-        <div class="fact">
-          <span class="micro micro-ink">2023 — Jul 2027</span>
-          <span><span class="f-deg">B.Tech, Electronics &amp; Communication</span><br><span class="f-inst">Biomedical Engineering specialisation · Vellore Institute of Technology</span></span>
-          <span class="f-val">8.14</span>
+        <div class="fct">
+          <span class="mono">2023 — Jul 2027</span>
+          <span><span class="d">B.Tech, Electronics &amp; Communication</span><br><span class="i">Biomedical Engineering specialisation · Vellore Institute of Technology</span></span>
+          <span class="v">8.14</span>
         </div>
-        <div class="fact">
-          <span class="micro micro-ink">2021 — 2023</span>
-          <span><span class="f-deg">Class XII — CBSE</span><br><span class="f-inst">Hem Sheela Model School</span></span>
-          <span class="f-val">88%</span>
+        <div class="fct">
+          <span class="mono">2021 — 2023</span>
+          <span><span class="d">Class XII — CBSE</span><br><span class="i">Hem Sheela Model School</span></span>
+          <span class="v">88%</span>
         </div>
-        <div class="fact">
-          <span class="micro micro-ink">2010 — 2021</span>
-          <span><span class="f-deg">Class X — ICSE</span><br><span class="f-inst">St. Xavier's School</span></span>
-          <span class="f-val">94%</span>
+        <div class="fct">
+          <span class="mono">2010 — 2021</span>
+          <span><span class="d">Class X — ICSE</span><br><span class="i">St. Xavier's School</span></span>
+          <span class="v">94%</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ RESEARCH DIRECTION ============ -->
-<section id="research">
-  <div class="lbl"><span class="micro">Ⅱ — Research direction</span><span class="micro">Doctoral intent</span></div>
+<!-- ══════════ 02 HYPOTHESIS ══════════ -->
+<section class="sec" id="research" data-sec="02 / Hypothesis" data-el="Fz">
+  <div class="shead"><span class="idn">02</span><span class="nm">Hypothesis</span><span class="mono">Doctoral intent</span></div>
 
-  <p class="stmt rv" data-split style="max-width:28ch">What a non-invasive measurement can recover depends on the <em>head it is recorded from</em> — not only the montage.</p>
+  <p class="lede rv" data-split style="max-width:30ch">What a non-invasive measurement can recover depends on the <em>head it is recorded from</em> — not only the montage.</p>
 
   <div class="prop rv">
-    <span class="p-lab">Doctoral proposal</span>
-    <span class="p-ttl">Anatomy-Conditioned Recoverability in Non-Invasive Neural Measurement</span>
+    <span class="pl">Doctoral proposal · Fall 2027</span>
+    <span class="pt">Anatomy-Conditioned Recoverability in Non-Invasive Neural Measurement</span>
   </div>
 
-  <div class="about-cols rv" style="max-width:82ch">
+  <div class="cols2 body2 rv" style="max-width:84ch">
     <div>
       <p>The proposal argues that identifiability of cortical mechanism from scalp measurement is <strong>conditional on individual head anatomy</strong>, not a fixed property of an electrode layout. The method is a simulation chain in which ground truth is known by construction, so recoverability can be measured rather than assumed.</p>
     </div>
@@ -540,323 +651,477 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
     </div>
   </div>
 
-  <div class="threads">
-    <div class="thread rv">
-      <span class="t-n">Thread 01</span>
-      <h3>Identifiability from non-invasive measurement</h3>
-      <p>Building a forward-and-inverse simulation chain where the generating mechanism is specified, so that what a montage can and cannot recover becomes an measurable quantity conditioned on anatomy.</p>
-      <span class="t-q">Which cortical mechanisms are recoverable from the scalp for <em>this</em> head, and which are structurally invisible?</span>
+  <!-- ░░ IDENTIFIABILITY LAB ░░ -->
+  <div class="lab rv" id="lab">
+    <div class="lab-hd">
+      <span class="t">Live · Identifiability probe</span>
+      <span>Drag either source — 16-electrode ring — simplified forward model</span>
     </div>
-    <div class="thread rv">
-      <span class="t-n">Thread 02</span>
-      <h3>What transfers across people and hardware</h3>
-      <p>The ISRO cross-modal result held within cohort and failed across subjects on a held-out database. The A*STAR attachment takes the next step: selective wet-to-dry EEG transfer, with negative transfer built into the analysis rather than hidden by an average.</p>
-      <span class="t-q">Can recordings from other people reduce calibration for a new one — and who is made worse off when they do?</span>
+    <div class="lab-bd">
+      <div class="lab-stage" id="labStage">
+        <canvas id="labCv"></canvas>
+      </div>
+      <div class="lab-side">
+        <div class="verdict ok" id="labVerdict">Separable</div>
+        <div class="rdo">
+          <span class="k">Condition number κ</span>
+          <span class="n good" id="labKappa">—</span>
+        </div>
+        <div class="rdo">
+          <span class="k">Scalp pattern correlation</span>
+          <span class="n" id="labCorr">—</span>
+        </div>
+        <div class="sld">
+          <label>Skull thickness <b id="labSkullV">6.5 mm</b></label>
+          <input type="range" id="labSkull" min="4" max="14" step="0.1" value="6.5">
+        </div>
+        <div class="sld">
+          <label>Source separation <b id="labSepV">17.4°</b></label>
+          <input type="range" id="labSep" min="0" max="100" step="1" value="35">
+        </div>
+        <button class="btn" id="labReset" style="align-self:flex-start">Reset</button>
+      </div>
     </div>
-    <div class="thread rv">
-      <span class="t-n">Thread 03</span>
-      <h3>Forward modelling &amp; neurophotonics</h3>
-      <p>Finite-element modelling of near-infrared photon diffusion in cortical tissue, validated against Monte Carlo, plus whole-body NIR transport across heterogeneous anatomy — the physics side of the same identifiability question.</p>
-      <span class="t-q">How far can diffuse optics be pushed toward reliable cortical readout outside a controlled lab?</span>
+    <div class="lab-note">
+      <b>What this shows.</b> Two cortical sources are projected onto a 16-electrode ring through a simplified single-layer dipole kernel, with the skull modelled as a circular spatial low-pass — the qualitatively right effect, since the skull smears high spatial frequencies. κ is the condition number of the two-column lead field: the ratio of its singular values, taken exactly from the 2×2 Gram matrix. Because κ is scale-invariant, only geometry and that low-pass can move it. <b>Try this:</b> leave the sources where they are and drag the skull from 4 mm to 14 mm. κ rises from about 2.8 to about 10 and the verdict flips — <em>same sources, same electrodes, different head.</em> That is the thesis in one gesture. Pull the sources apart and κ falls; push them together and it diverges, because two causes now produce one measurement. Illustrative model, not a solver.
     </div>
   </div>
 
-  <div class="seeking rv">
-    <span class="s-v">Seeking a <em>direct PhD</em> for Fall 2027 in computational neuroscience or neural signal processing.</span>
-    <span class="micro">Open to enquiries — <a href="#contact" style="border-bottom:1px solid var(--line)">get in touch</a></span>
+  <div class="caps rv" style="margin-top:clamp(44px,6vh,78px)">
+    <div class="cap-g">
+      <h3>Thread 01 · Identifiability</h3>
+      <p style="font-size:1rem;line-height:1.66;font-family:var(--sans);color:var(--fg2)">A forward-and-inverse simulation chain where the generating mechanism is specified, so what a montage can and cannot recover becomes a measured quantity conditioned on anatomy.</p>
+      <p style="margin-top:14px;font-style:italic;color:var(--fg)">Which cortical mechanisms are recoverable from the scalp for <em>this</em> head, and which are structurally invisible?</p>
+    </div>
+    <div class="cap-g">
+      <h3>Thread 02 · Transfer</h3>
+      <p style="font-size:1rem;line-height:1.66;font-family:var(--sans);color:var(--fg2)">The ISRO cross-modal result held within cohort and failed across subjects. The A*STAR attachment takes the next step: selective wet-to-dry transfer, with negative transfer built into the analysis rather than hidden by an average.</p>
+      <p style="margin-top:14px;font-style:italic;color:var(--fg)">Can recordings from other people reduce calibration for a new one — and who is made worse off when they do?</p>
+    </div>
+    <div class="cap-g">
+      <h3>Thread 03 · Neurophotonics</h3>
+      <p style="font-size:1rem;line-height:1.66;font-family:var(--sans);color:var(--fg2)">Finite-element modelling of near-infrared photon diffusion in cortical tissue, validated against Monte Carlo, plus whole-body NIR transport across heterogeneous anatomy — the physics side of the same question.</p>
+      <p style="margin-top:14px;font-style:italic;color:var(--fg)">How far can diffuse optics be pushed toward reliable cortical readout outside a controlled lab?</p>
+    </div>
+  </div>
+
+  <div class="rv" style="margin-top:clamp(44px,7vh,86px);padding-top:24px;border-top:1px solid var(--fg);display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:baseline">
+    <span class="ser" style="font-size:clamp(1.18rem,2.7vw,1.9rem);line-height:1.22;max-width:36ch">Seeking a <em style="color:var(--acc)">direct PhD</em> for Fall 2027 in computational neuroscience or neural signal processing.</span>
+    <a href="#contact" class="mono lit" style="border-bottom:1px solid var(--line2);padding-bottom:3px">Open to enquiries →</a>
   </div>
 </section>
-
-<!-- ============ EXPERIENCE ============ -->
-<section id="experience">
-  <div class="lbl"><span class="micro">Ⅲ — Experience</span><span class="micro">Select to expand</span></div>
+<!-- ══════════ 03 RECORD ══════════ -->
+<section class="sec" id="experience" data-sec="03 / Record" data-el="C3">
+  <div class="shead"><span class="idn">03</span><span class="nm">Record</span><span class="mono">Select to expand</span></div>
 
   <div class="xp">
-    <article class="xrow open rv">
-      <div class="xhead" role="button" tabindex="0" aria-expanded="true">
-        <span class="xnum">01</span>
+    <article class="xr open rv">
+      <div class="xh" role="button" tabindex="0" aria-expanded="true">
+        <span class="xn">01</span>
         <span>
-          <span class="xorg-big">A*STAR</span>
-          <span class="xorg-full">Agency for Science, Technology and Research</span>
-          <span class="xrole">Research Attachment — EEG Manifold Representations for Cognition</span>
-          <span class="xplace">Institute of Advanced Intelligence and Computing (IAIC) · Singapore · Supervisors: Dr. Phua Kok Soon, Koh Tze Hui</span>
+          <span class="xo">A*STAR</span>
+          <span class="xf">Agency for Science, Technology and Research</span>
+          <span class="xrl">Research Attachment — EEG Manifold Representations for Cognition</span>
+          <span class="xpl">Institute of Advanced Intelligence and Computing (IAIC) · Singapore · Supervisors: Dr. Phua Kok Soon, Koh Tze Hui</span>
         </span>
-        <span class="xdate"><span class="xnow">From Dec 2026</span></span>
-        <span class="xtoggle"></span>
+        <span class="xd"><span class="now">07 Dec 2026 — 16 Apr 2027</span></span>
+        <span class="xt"></span>
       </div>
-      <div class="xbody"><div class="xbody-in">
-        <p>Final-semester bachelor's thesis attachment: transferring selected representations from a wet-electrode EEG encoder to a dry-electrode encoder, so that a low-dimensional frontal manifold can support headband-grade inference.</p>
-        <p>Central question — can wet EEG collected from other people reduce the calibration a new person needs on dry EEG?</p>
-        <p>Three sub-questions, each with its own reporting standard: whether it generalises to new people, whether it reduces labelled-trial requirements, and <strong>who it harms</strong> — individual gains and losses reported separately, since a higher mean can conceal negative transfer.</p>
-        <p>Baselines first, then selective transfer with controlled ablations as the main modelling contribution; public wet and dry EEG recordings across 102 subjects.</p>
+      <div class="xb"><div class="xbi">
+        <p>Final-semester bachelor's thesis attachment under VIT's Semester Abroad Programme: transferring selected representations from a wet-electrode EEG encoder to a dry-electrode encoder, so a low-dimensional frontal manifold can support headband-grade inference.</p>
+        <p>Central question — <strong>can wet EEG collected from other people reduce the calibration a new person needs on dry EEG?</strong></p>
+        <p>Three sub-questions, each with its own reporting standard: whether it generalises to new people; whether it reduces labelled-trial requirements; and <strong>who it harms</strong> — individual gains and losses reported separately, since a higher mean can conceal negative transfer.</p>
+        <p>Baselines first, then selective transfer with controlled ablations as the main modelling contribution. Public wet and dry EEG recordings across 102 subjects.</p>
+        <p>An optional final block tests whether any benefit survives reducing dry input from eight channels to four predefined posterior ones.</p>
       </div></div>
     </article>
 
-    <article class="xrow rv">
-      <div class="xhead" role="button" tabindex="0" aria-expanded="false">
-        <span class="xnum">02</span>
+    <article class="xr rv">
+      <div class="xh" role="button" tabindex="0" aria-expanded="false">
+        <span class="xn">02</span>
         <span>
-          <span class="xorg-big">ISRO</span>
-          <span class="xorg-full">Indian Space Research Organisation</span>
-          <span class="xrole">Corresponding Project Trainee</span>
-          <span class="xplace">Human Space Flight Centre (HSFC) · Biomedical Engineering Division · Bengaluru</span>
+          <span class="xo">ISRO</span>
+          <span class="xf">Indian Space Research Organisation</span>
+          <span class="xrl">Corresponding Project Trainee</span>
+          <span class="xpl">Human Space Flight Centre (HSFC) · Biomedical Engineering Division · Bengaluru</span>
         </span>
-        <span class="xdate">May — Jun 2026</span>
-        <span class="xtoggle"></span>
+        <span class="xd">May — Jun 2026</span>
+        <span class="xt"></span>
       </div>
-      <div class="xbody"><div class="xbody-in">
+      <div class="xb"><div class="xbi">
         <p>Built an independent cross-modal EEG/ECG reconstruction framework in BMED using transformer architectures with 1D-CNN synthesis, on telemetry comprising 5,000+ biological waveform segments.</p>
         <p>Designed a high-frequency filtering engine to harmonise multimodal inputs with processing bounds up to 45 Hz.</p>
         <p>Reconstruction reached &gt;99% signal tracking <strong>within cohort</strong> — a self-recognition result, not cross-subject generalisation. Held out against an independent database, transfer failed.</p>
-        <p>That negative holdout is the finding I carried forward: it localises the problem to inter-subject and inter-hardware variability, and directly motivates the A*STAR selective-transfer project.</p>
+        <p>That negative holdout is the finding I carried forward: it localises the barrier to inter-subject and inter-hardware variability, and directly motivates the A*STAR selective-transfer project.</p>
         <p>Diagnostic transformer classification mapping compressed global token matrices to 10 anomaly classes; training-loop convergence maintained under high dataset variance.</p>
       </div></div>
     </article>
 
-    <article class="xrow rv">
-      <div class="xhead" role="button" tabindex="0" aria-expanded="false">
-        <span class="xnum">03</span>
+    <article class="xr rv">
+      <div class="xh" role="button" tabindex="0" aria-expanded="false">
+        <span class="xn">03</span>
         <span>
-          <span class="xorg-big">North Technoprojects</span>
-          <span class="xorg-full">India Pvt. Ltd.</span>
-          <span class="xrole">Hardware &amp; Embedded Systems Intern</span>
-          <span class="xplace">Smart embedded architectures for predictive maintenance in CNC &amp; hydraulic systems · Durgapur</span>
+          <span class="xo">North Technoprojects</span>
+          <span class="xf">India Pvt. Ltd.</span>
+          <span class="xrl">Hardware &amp; Embedded Systems Intern</span>
+          <span class="xpl">Smart embedded architectures for predictive maintenance in CNC &amp; hydraulic systems · Durgapur</span>
         </span>
-        <span class="xdate">May — Jul 2025</span>
-        <span class="xtoggle"></span>
+        <span class="xd">20 May — 04 Jul 2025</span>
+        <span class="xt"></span>
       </div>
-      <div class="xbody"><div class="xbody-in">
-        <p>Sole contributor on "Design of Smart Embedded Architectures for Predictive Maintenance and Closed-Loop Optimization in CNC and Hydraulic Systems" across 32 working days.</p>
+      <div class="xb"><div class="xbi">
+        <p>Sole contributor on "Design of Smart Embedded Architectures for Predictive Maintenance and Closed-Loop Optimization in CNC and Hydraulic Systems", across 32 working days.</p>
         <p>Real-time vibration monitoring on an STM32F103C8T6 with an ADXL345 3-axis accelerometer, sampling at 3200 Hz for spindle wear detection.</p>
         <p>256-point embedded FFT in C++ for frequency-domain analysis, reaching 98% fault detection accuracy and reducing unexpected breakdowns by 18%.</p>
         <p>Compact 2-layer KiCad PCB with 40% footprint reduction; RS485 Modbus SCADA integration under 120 ms latency.</p>
       </div></div>
     </article>
 
-    <article class="xrow rv">
-      <div class="xhead" role="button" tabindex="0" aria-expanded="false">
-        <span class="xnum">04</span>
+    <article class="xr rv">
+      <div class="xh" role="button" tabindex="0" aria-expanded="false">
+        <span class="xn">04</span>
         <span>
-          <span class="xorg-big">CSIR&#8203;-CMERI</span>
-          <span class="xorg-full">Council of Scientific &amp; Industrial Research</span>
-          <span class="xrole">Research Intern</span>
-          <span class="xplace">Central Mechanical Engineering Research Institute · Mechatronics Dept. · Durgapur · Under Dr. Soumen Mandal</span>
+          <span class="xo">CSIR&#8203;-CMERI</span>
+          <span class="xf">Council of Scientific &amp; Industrial Research</span>
+          <span class="xrl">Research Intern</span>
+          <span class="xpl">Central Mechanical Engineering Research Institute · Mechatronics Dept. · Durgapur · Under Dr. Soumen Mandal</span>
         </span>
-        <span class="xdate">May — Jun 2025</span>
-        <span class="xtoggle"></span>
+        <span class="xd">May — Jun 2025</span>
+        <span class="xt"></span>
       </div>
-      <div class="xbody"><div class="xbody-in">
+      <div class="xb"><div class="xbi">
         <p>Engineered and calibrated 16+ analog stretch sensor circuits for a full hand using voltage divider networks and Arduino Uno boards to quantify grasp strength in a micro-motor feedback system, matching reference curves within ±0.02 V.</p>
-        <p>Programmed voltage-to-resistance conversion algorithms in embedded C to classify hand gestures (open, semi-flexed, clenched) at 97.8% recognition accuracy across calibrated units.</p>
+        <p>Programmed voltage-to-resistance conversion algorithms in embedded C to classify hand gestures — open, semi-flexed, clenched — at 97.8% recognition accuracy across calibrated units.</p>
         <p>Trained a custom CNN for multi-class tissue classification across 6 histopathology types, with transfer learning and dynamic augmentation to counter class imbalance.</p>
       </div></div>
     </article>
   </div>
 </section>
 
-<!-- ============ WORK (horizontal) ============ -->
-<section class="work-intro" id="work">
-  <div class="lbl"><span class="micro">Ⅳ — Selected projects</span><span class="micro">Twelve works</span></div>
-  <p class="stmt rv" data-split style="max-width:22ch">Twelve investigations in <em>signal, tissue &amp; inference.</em></p>
+<!-- ══════════ 04 INSTRUMENTS ══════════ -->
+<section class="sec" id="work" data-sec="04 / Instruments" data-el="Pz" style="padding-bottom:0">
+  <div class="shead"><span class="idn">04</span><span class="nm">Instruments</span><span class="mono">Fourteen works · live readouts</span></div>
+  <p class="lede rv" data-split style="max-width:24ch;margin-bottom:0">Fourteen investigations in <em>signal, tissue &amp; inference.</em></p>
 </section>
 
-<div class="hwrap" id="hwrap">
-  <div class="hstick">
-    <div class="htrack" id="htrack">
+<div class="hw" id="hw">
+  <div class="hs">
+    <div class="ht" id="ht">
 
-      <div class="divider"><div class="d-in">Ⅰ &nbsp;Neural Signal &amp; Decoding</div></div>
+      <div class="dv"><div class="dv-in">Ⅰ&nbsp; Decoding &amp; Inverse Problems</div></div>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">01<sup>ISRO</sup></span></div>
-        <h3 class="p-title">Cross-Modal Reconstruction of EEG from ECG</h3>
-        <div class="p-body">
-          <p>Transformer architecture with 1D-CNN synthesis over 5,000+ waveform segments of ISRO HSFC telemetry.</p>
-          <p>High-frequency filtering engine harmonising multimodal inputs up to 45 Hz.</p>
-          <p>&gt;99% signal tracking within cohort — self-recognition rather than cross-subject generalisation.</p>
-          <p>Failed on an independent held-out database. Reported as the primary finding; it localises the barrier to inter-subject and inter-hardware variability.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="loss"></canvas><span class="tag">Loss landscape · multi-start descent</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">01<sup>Project-I</sup></span></div>
+          <h3 class="pn-t">Conditioning and Non-Convexity of Semantic Decoding by Inversion of Deep Brain Encoding Models</h3>
+          <div class="pn-b">
+            <p>Inverts Meta's <strong>TRIBE v2</strong> fMRI brain-encoding model to recover semantic content, and asks when that inversion is well-posed at all.</p>
+            <p>Treats decoding as an explicit inverse problem: characterises the conditioning of the forward operator and the non-convexity of the inversion objective, rather than assuming a decoder will simply converge.</p>
+            <p>VIT Project-I (BECE497J) with Tanisha, guided by Dr. Sharmila Nageswaran. Final review 29 Oct 2026 — poster, viva and working demo.</p>
+          </div>
+          <div class="pn-g"><b>TRIBE v2</b><b>Inverse Problems</b><b>Conditioning</b><b>fMRI</b></div>
+          <span class="pn-st">Complete · VIT · Oct 2026</span>
         </div>
-        <div class="p-tags"><b>Transformers</b><b>Multimodal DSP</b><b>Python</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/1rihL5mj62eKVIuGT3_Oed1usPHnq4piZ/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">02</span></div>
-        <h3 class="p-title">Multi-Modal Framework for Automated Epileptic Seizure Detection</h3>
-        <div class="p-body">
-          <p>1D-CNN over raw EEG combined with spectrogram analysis for real-time seizure detection.</p>
-          <p>Temporal feature extraction paired with frequency-domain dimensionality reduction (PCA).</p>
-          <p>Designed edge-ready for continuous ambulatory EEG monitoring rather than offline batch scoring.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="xmodal"></canvas><span class="tag">ECG → EEG reconstruction · live</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">02<sup>ISRO</sup></span></div>
+          <h3 class="pn-t">Cross-Modal Reconstruction of EEG from ECG</h3>
+          <div class="pn-b">
+            <p>Transformer architecture with 1D-CNN synthesis over 5,000+ waveform segments of ISRO HSFC telemetry.</p>
+            <p>High-frequency filtering engine harmonising multimodal inputs up to 45 Hz.</p>
+            <p>&gt;99% signal tracking <strong>within cohort</strong> — self-recognition, not cross-subject generalisation.</p>
+            <p>Failed on an independent held-out database. Reported as the primary finding; it localises the barrier to inter-subject and inter-hardware variability.</p>
+          </div>
+          <div class="pn-g"><b>Transformers</b><b>Multimodal DSP</b><b>Python</b></div>
+          <a class="pn-l" href="https://drive.google.com/file/d/1rihL5mj62eKVIuGT3_Oed1usPHnq4piZ/view?usp=sharing" target="_blank" rel="noopener">View project →</a>
         </div>
-        <div class="p-tags"><b>1D-CNN</b><b>EEG</b><b>PCA</b><b>Spectrograms</b></div>
-        <a class="p-link" href="https://docs.google.com/presentation/d/1A-0nxe9CPnzMxAreufKa9h3hWmGErUqH/edit?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">03</span></div>
-        <h3 class="p-title">ECG Arrhythmia Classification on the MIT-BIH Database</h3>
-        <div class="p-body">
-          <p>Parallel pipelines using classical ML and 1D-CNNs for automated arrhythmia detection.</p>
-          <p>Domain-driven features from ECG morphology and heart-rate variability, benchmarked against end-to-end learning on raw segments.</p>
-          <p>Evaluated on accuracy, interpretability and compute cost for wearable and remote-monitoring deployment.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="manifold"></canvas><span class="tag">Wet / dry latent manifolds</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">03<sup>A*STAR</sup></span></div>
+          <h3 class="pn-t">Selective Wet-to-Dry EEG Representation Transfer</h3>
+          <div class="pn-b">
+            <p>Transfers selected representations from a wet-electrode encoder to a dry-electrode encoder across 102 subjects of public recordings.</p>
+            <p>Reports participant-averaged accuracy with paired uncertainty, calibration curves against labelled-trial count, and <strong>per-subject gains and losses</strong> — because a higher mean can conceal harmful transfer.</p>
+            <p>Begins 07 Dec 2026 at A*STAR IAIC, Singapore.</p>
+          </div>
+          <div class="pn-g"><b>Representation Learning</b><b>Domain Transfer</b><b>Dry EEG</b></div>
+          <span class="pn-st">Incoming · Dec 2026</span>
         </div>
-        <div class="p-tags"><b>1D-CNN</b><b>MIT-BIH</b><b>HRV Features</b></div>
-        <a class="p-link" href="https://docs.google.com/document/d/13SwOLHxTE49sPiBNSeam5UE5DKBIkubD9z4AB9Hx7GQ/edit?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">04</span></div>
-        <h3 class="p-title">Brain MRI Tumour Classification via Transfer Learning</h3>
-        <div class="p-body">
-          <p>500+ brain MRI scans across four categories — glioma, meningioma, pituitary, no-tumour — on a modified ResNet-50.</p>
-          <p>Kept as an instructive baseline: an ImageNet-pretrained backbone transfers poorly to greyscale medical volumes, which is the point of the entry.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="seizure"></canvas><span class="tag">Spectrogram · 1D-CNN detector</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">04</span></div>
+          <h3 class="pn-t">Multi-Modal Framework for Automated Epileptic Seizure Detection</h3>
+          <div class="pn-b">
+            <p>1D-CNN over raw EEG combined with spectrogram analysis for real-time seizure detection.</p>
+            <p>Temporal feature extraction paired with frequency-domain dimensionality reduction (PCA).</p>
+            <p>Built edge-ready for continuous ambulatory monitoring rather than offline batch scoring.</p>
+          </div>
+          <div class="pn-g"><b>1D-CNN</b><b>EEG</b><b>PCA</b><b>Spectrograms</b></div>
+          <a class="pn-l" href="https://docs.google.com/presentation/d/1A-0nxe9CPnzMxAreufKa9h3hWmGErUqH/edit?usp=sharing" target="_blank" rel="noopener">View project →</a>
         </div>
-        <div class="p-tags"><b>TensorFlow / Keras</b><b>ResNet-50</b><b>Medical Imaging</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/12OUgRMhN3E73th4QbKM2vfqrK74S0Hsy/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
-      <div class="divider"><div class="d-in">Ⅱ &nbsp;Modelling &amp; Simulation</div></div>
-
-      <article class="panel">
-        <div class="p-top"><span class="p-num">05<sup>Manuscript</sup></span></div>
-        <h3 class="p-title">FEM Forward Modelling of Near-Infrared Photon Diffusion in Cortical Tissue</h3>
-        <div class="p-body">
-          <p>Finite-element photon transport model rebuilt in Python at 800 nm — 1,236 nodes, 2,352 triangular elements — with a three-stage verification chain.</p>
-          <p>Continuous-wave diffusion solves with gray-matter-matched optical parameters; under 0.5% variance across mesh refinements.</p>
-          <p>Above 99.3% agreement with Monte Carlo simulation, max local error under 1.2%, R = 0.996 across detector fluence outputs.</p>
-          <p>Written up as a seven-page IEEE-format manuscript with 32 references. Not yet submitted.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="ecg"></canvas><span class="tag">MIT-BIH · beat annotation</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">05</span></div>
+          <h3 class="pn-t">ECG Arrhythmia Classification on the MIT-BIH Database</h3>
+          <div class="pn-b">
+            <p>Parallel pipelines using classical ML and 1D-CNNs for automated arrhythmia detection.</p>
+            <p>Domain-driven features from ECG morphology and heart-rate variability, benchmarked against end-to-end learning on raw segments.</p>
+            <p>Evaluated on accuracy, interpretability and compute cost for wearable deployment.</p>
+          </div>
+          <div class="pn-g"><b>1D-CNN</b><b>MIT-BIH</b><b>HRV Features</b></div>
+          <a class="pn-l" href="https://docs.google.com/document/d/13SwOLHxTE49sPiBNSeam5UE5DKBIkubD9z4AB9Hx7GQ/edit?usp=sharing" target="_blank" rel="noopener">View project →</a>
         </div>
-        <div class="p-tags"><b>Python</b><b>FEM</b><b>DOT / fNIRS</b><b>Monte Carlo Validation</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/13ai3StiH2g9qiGmBimJEPsfzG_FGzWfl/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">06</span></div>
-        <h3 class="p-title">Elliptical Whole-Body NIR Light Transport Simulator</h3>
-        <div class="p-body">
-          <p>MATLAB framework modelling whole-body near-infrared light transport through an elliptical five-layer tissue cross-section.</p>
-          <p>Dense triangular mesh with configurable source–detector arrangements for fluence distribution in heterogeneous anatomy.</p>
-          <p>Log-fluence maps and source–detector path profiles supporting multi-wavelength sensitivity analysis.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="mri"></canvas><span class="tag">Feature-space separation</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">06</span></div>
+          <h3 class="pn-t">Brain MRI Tumour Classification via Transfer Learning</h3>
+          <div class="pn-b">
+            <p>500+ brain MRI scans across four categories — glioma, meningioma, pituitary, no-tumour — on a modified ResNet-50.</p>
+            <p>Kept as an instructive baseline: an ImageNet-pretrained backbone transfers poorly to greyscale medical volumes, which is the point of the entry.</p>
+          </div>
+          <div class="pn-g"><b>TensorFlow / Keras</b><b>ResNet-50</b><b>Medical Imaging</b></div>
+          <a class="pn-l" href="https://drive.google.com/file/d/12OUgRMhN3E73th4QbKM2vfqrK74S0Hsy/view?usp=sharing" target="_blank" rel="noopener">View project →</a>
         </div>
-        <div class="p-tags"><b>MATLAB</b><b>NIR Transport</b><b>Tissue Modelling</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/1nk0uBj_d0mXQQbLxUGzBKP1kSwnE5zEG/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">07</span></div>
-        <h3 class="p-title">Automated FE Pipeline for Flexible Neural Implant Design</h3>
-        <div class="p-body">
-          <p>Automated finite-element pipeline analysing micromotion-induced strain across metals, alloy compositions, cross-section shapes, sizes and filler concentrations.</p>
-          <p>7,400 design configurations solved on a verified in-house Python FE solver; 2,161 feasible. ANSYS cross-validation in progress.</p>
-          <p>Best overall candidate: polyimide with 30 vol% Ti-6Al-4V in a U-channel section. Section shape alone yields roughly 3.4× less cross-sectional area and mass than the solid rectangles used by commercial probes.</p>
+      <div class="dv"><div class="dv-in">Ⅱ&nbsp; Physics &amp; Simulation</div></div>
+
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="banana"></canvas><span class="tag">PMDF sensitivity · source→detector</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">07<sup>Manuscript</sup></span></div>
+          <h3 class="pn-t">FEM Forward Modelling of Near-Infrared Photon Diffusion in Cortical Tissue</h3>
+          <div class="pn-b">
+            <p>Finite-element photon transport model rebuilt in Python at 800 nm — 1,236 nodes, 2,352 triangular elements — with a three-stage verification chain.</p>
+            <p>Continuous-wave diffusion solves with grey-matter-matched optical parameters; under 0.5% variance across mesh refinements.</p>
+            <p>Above 99.3% agreement with Monte Carlo, max local error under 1.2%, R = 0.996 across detector fluence outputs.</p>
+            <p>Written up as a <strong>seven-page IEEE-format manuscript, 32 references</strong>. Not yet submitted.</p>
+          </div>
+          <div class="pn-g"><b>Python</b><b>FEM</b><b>DOT / fNIRS</b><b>Monte Carlo</b></div>
+          <a class="pn-l" href="https://drive.google.com/file/d/13ai3StiH2g9qiGmBimJEPsfzG_FGzWfl/view?usp=sharing" target="_blank" rel="noopener">View project →</a>
         </div>
-        <div class="p-tags"><b>Python FE Solver</b><b>ANSYS APDL</b><b>Neural Implants</b></div>
-        <span class="p-status">Course project · VIT · Review 3 in progress</span>
       </article>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">08</span></div>
-        <h3 class="p-title">RL-Driven Adaptive Admittance Control for Neuro-Rehabilitation Robotics</h3>
-        <div class="p-body">
-          <p>Two-layer architecture in which a reinforcement-learning supervisor tunes admittance parameters (K and C) rather than commanding the robot directly.</p>
-          <p>2-link planar arm with a simulated patient exhibiting fatigue and motor-slacking dynamics; interactive parameter sliders.</p>
-          <p>Delivered as a single-file simulation on numpy and matplotlib alone — check, play, gif, sweep, eval, compare and train subcommands.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="fluence"></canvas><span class="tag">Five-layer log-fluence map</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">08</span></div>
+          <h3 class="pn-t">Elliptical Whole-Body NIR Light Transport Simulator</h3>
+          <div class="pn-b">
+            <p>MATLAB framework modelling whole-body near-infrared transport through an elliptical five-layer tissue cross-section.</p>
+            <p>Dense triangular mesh with configurable source–detector arrangements for fluence distribution in heterogeneous anatomy.</p>
+            <p>Log-fluence maps and source–detector path profiles supporting multi-wavelength sensitivity analysis.</p>
+          </div>
+          <div class="pn-g"><b>MATLAB</b><b>NIR Transport</b><b>Tissue Modelling</b></div>
+          <a class="pn-l" href="https://drive.google.com/file/d/1nk0uBj_d0mXQQbLxUGzBKP1kSwnE5zEG/view?usp=sharing" target="_blank" rel="noopener">View project →</a>
         </div>
-        <div class="p-tags"><b>Reinforcement Learning</b><b>Admittance Control</b><b>NumPy</b></div>
-        <span class="p-status">Course project · VIT · Medical Robotics</span>
       </article>
 
-      <div class="divider"><div class="d-in">Ⅲ &nbsp;Instrumentation &amp; Devices</div></div>
-
-      <article class="panel">
-        <div class="p-top"><span class="p-num">09</span></div>
-        <h3 class="p-title">Optically-Isolated EEG Transceiver over Plastic Optical Fibre</h3>
-        <div class="p-body">
-          <p>Galvanically isolated EEG acquisition front end: LED transmitter into plastic optical fibre, BPW34 photodiode receiver.</p>
-          <p>Optical isolation removes the mains-referenced leakage path entirely, which is the safety argument for patient-connected amplifiers.</p>
-          <p>DSP conditioning chain feeding 1D-CNN seizure detection on the recovered signal; responsible for the software end of a three-person build.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="fem"></canvas><span class="tag">Q4 plane-strain mesh · micromotion</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">09</span></div>
+          <h3 class="pn-t">Automated FE Pipeline for Flexible Neural Implant Design</h3>
+          <div class="pn-b">
+            <p>From-scratch <strong>Q4 plane-strain solver, 56,364 DOF</strong>, plus a reduced-order beam-on-Winkler-foundation model, analysing micromotion-induced strain across materials, alloy compositions, section shapes, sizes and filler concentrations.</p>
+            <p>7,400 configurations solved, 2,161 feasible. Verified through six internal checks (V1–V6) and five cross-validation checks (X1–X5) — the verification chain is the credibility backbone. ANSYS cross-validation in progress.</p>
+            <p>Best candidate: polyimide with 30 vol% Ti-6Al-4V in a U-channel section. Section shape alone yields ~3.4× less cross-sectional area and mass than the solid rectangles commercial probes use.</p>
+          </div>
+          <div class="pn-g"><b>Python FE Solver</b><b>ANSYS APDL</b><b>Fusion 360</b><b>Neural Implants</b></div>
+          <span class="pn-st">Course project · VIT · Review 3</span>
         </div>
-        <div class="p-tags"><b>POF</b><b>BPW34</b><b>Analog Front End</b><b>1D-CNN</b></div>
-        <span class="p-status">Course project · VIT · Optical Fibre Communications</span>
       </article>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">10</span></div>
-        <h3 class="p-title">Wearable Hand Tremor Detection System</h3>
-        <div class="p-body">
-          <p>Low-cost wearable for real-time detection and classification of hand tremors toward early-stage Parkinson's screening.</p>
-          <p>MPU6050 accelerometer/gyroscope with adaptive threshold-based tremor filtering.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="arm"></canvas><span class="tag">2-link arm · RL-tuned admittance</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">10</span></div>
+          <h3 class="pn-t">RL-Driven Adaptive Admittance Control for Neuro-Rehabilitation Robotics</h3>
+          <div class="pn-b">
+            <p>Two-layer architecture in which a reinforcement-learning supervisor tunes admittance parameters K and C rather than commanding the robot directly.</p>
+            <p>2-link planar arm with a simulated patient exhibiting fatigue and motor-slacking dynamics; interactive parameter sliders.</p>
+            <p>Single-file simulation on numpy and matplotlib alone — check, play, gif, sweep, eval, compare and train subcommands. Browser simulator demonstrated as the working model at Review 3.</p>
+          </div>
+          <div class="pn-g"><b>Reinforcement Learning</b><b>Admittance Control</b><b>NumPy</b></div>
+          <span class="pn-st">Course project · VIT · Medical Robotics</span>
         </div>
-        <div class="p-tags"><b>MPU6050</b><b>Arduino</b><b>Signal Filtering</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/1EGvJHr2vHYkmI6chr-whrpI4SPSempxX/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">11</span></div>
-        <h3 class="p-title">Non-Enzymatic Salivary Glucose Sensor Using CuO Nanozymes</h3>
-        <div class="p-body">
-          <p>Shelf-stable abiotic biosensor using copper-oxide nanozymes and a 3D cellulose architecture for decentralised salivary glucose monitoring.</p>
-          <p>Removes thermal instability and cold-chain requirements, retaining 98% of signal over 30 days.</p>
-          <p>Designed for cost and durability in resource-limited diagnostic settings.</p>
+      <div class="dv"><div class="dv-in">Ⅲ&nbsp; Instrumentation &amp; Devices</div></div>
+
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="optical"></canvas><span class="tag">LED → POF → BPW34 · isolated link</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">11<sup>IDF filed</sup></span></div>
+          <h3 class="pn-t">Optically-Isolated EEG Transceiver over Plastic Optical Fibre</h3>
+          <div class="pn-b">
+            <p>Galvanically isolated EEG front end: LED transmitter into plastic optical fibre, BPW34 photodiode receiver.</p>
+            <p>Optical isolation removes the mains-referenced leakage path entirely — the safety argument for patient-connected amplifiers.</p>
+            <p>DSP conditioning chain feeding 1D-CNN seizure detection on the recovered signal. Responsible for the software end of a three-person build; guide requested VIT <strong>IPR invention disclosure forms (IDF-A, IDF-B)</strong> after the final review.</p>
+          </div>
+          <div class="pn-g"><b>POF</b><b>BPW34</b><b>Analog Front End</b><b>1D-CNN</b></div>
+          <span class="pn-st">Course project · VIT · Optical Fibre Comms</span>
         </div>
-        <div class="p-tags"><b>CuO Nanozymes</b><b>Biosensors</b><b>Nanotechnology</b></div>
-        <a class="p-link" href="https://drive.google.com/file/d/1muOpAmvC258dXyBV1cUSXz_NjiaC1USF/view?usp=sharing" target="_blank" rel="noopener">View project <span>⟶</span></a>
       </article>
 
-      <article class="panel">
-        <div class="p-top"><span class="p-num">12</span></div>
-        <h3 class="p-title">Client-Side Neural Network Training &amp; Inference Lab</h3>
-        <div class="p-body">
-          <p>Single-page application for in-browser dataset labelling, network construction and real-time hyperparameter tuning.</p>
-          <p>Training and inference entirely client-side via WebGL/WebGPU — no server dependency, no data leaving the device.</p>
-          <p>Client-side model serialisation, aimed at federated-learning and edge-AI workflows.</p>
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="tremor"></canvas><span class="tag">MPU6050 · 3-axis · tremor band</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">12</span></div>
+          <h3 class="pn-t">Wearable Hand Tremor Detection System</h3>
+          <div class="pn-b">
+            <p>Low-cost wearable for real-time detection and classification of hand tremors toward early-stage Parkinson's screening.</p>
+            <p>MPU6050 accelerometer/gyroscope with adaptive threshold-based tremor filtering in the 4–6 Hz band.</p>
+          </div>
+          <div class="pn-g"><b>MPU6050</b><b>Arduino</b><b>Signal Filtering</b></div>
+          <a class="pn-l" href="https://drive.google.com/file/d/1EGvJHr2vHYkmI6chr-whrpI4SPSempxX/view?usp=sharing" target="_blank" rel="noopener">View project →</a>
         </div>
-        <div class="p-tags"><b>TensorFlow.js</b><b>WebGL / WebGPU</b><b>Edge AI</b></div>
-        <a class="p-link" href="https://github.com/ivxn404/deepl-mt" target="_blank" rel="noopener">View on GitHub <span>⟶</span></a>
+      </article>
+
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="glucose"></canvas><span class="tag">30-day signal retention</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">13</span></div>
+          <h3 class="pn-t">Non-Enzymatic Salivary Glucose Sensor Using CuO Nanozymes</h3>
+          <div class="pn-b">
+            <p>Shelf-stable abiotic biosensor using copper-oxide nanozymes and a 3D cellulose architecture for decentralised salivary glucose monitoring.</p>
+            <p>Removes thermal instability and cold-chain requirements, retaining 98% of signal over 30 days.</p>
+            <p>Designed for cost and durability in resource-limited diagnostic settings.</p>
+          </div>
+          <div class="pn-g"><b>CuO Nanozymes</b><b>Biosensors</b><b>Nanotechnology</b></div>
+          <a class="pn-l" href="https://drive.google.com/file/d/1muOpAmvC258dXyBV1cUSXz_NjiaC1USF/view?usp=sharing" target="_blank" rel="noopener">View project →</a>
+        </div>
+      </article>
+
+      <article class="pn">
+        <div class="pn-vis"><canvas data-vis="net"></canvas><span class="tag">In-browser training · client-side</span></div>
+        <div class="pn-in">
+          <div class="pn-top"><span class="pn-n">14</span></div>
+          <h3 class="pn-t">Client-Side Neural Network Training &amp; Inference Lab</h3>
+          <div class="pn-b">
+            <p>Single-page application for in-browser dataset labelling, network construction and real-time hyperparameter tuning.</p>
+            <p>Training and inference entirely client-side via WebGL/WebGPU — no server dependency, no data leaving the device.</p>
+            <p>Client-side model serialisation, aimed at federated-learning and edge-AI workflows.</p>
+          </div>
+          <div class="pn-g"><b>TensorFlow.js</b><b>WebGL / WebGPU</b><b>Edge AI</b></div>
+          <a class="pn-l" href="https://github.com/ivxn404/deepl-mt" target="_blank" rel="noopener">View on GitHub →</a>
+        </div>
       </article>
 
     </div>
-    <div class="hhint"><span class="micro">Scroll to advance</span></div>
-    <div class="hprog"><i id="hprog"></i></div>
+    <div class="hhint mono">Scroll to advance →</div>
+    <div class="hbar"><i id="hbarFill"></i></div>
   </div>
 </div>
 
-<!-- ============ SKILLS ============ -->
-<section id="skills">
-  <div class="lbl"><span class="micro">Ⅴ — Capabilities</span></div>
-  <div class="sk">
-    <div class="sk-g rv"><h3>Core</h3><p>Biomedical Signal Processing <span>/</span> Neural Decoding <span>/</span> Embedded Systems <span>/</span> Forward Modelling <span>/</span> Real-Time Systems</p></div>
-    <div class="sk-g rv"><h3>Languages</h3><p>Python <span>/</span> MATLAB <span>/</span> C <span>/</span> C++ <span>/</span> Verilog <span>/</span> ARM Assembly <span>/</span> JavaScript <span>/</span> Java</p></div>
-    <div class="sk-g rv"><h3>Methods</h3><p>Transformers <span>/</span> 1D-CNNs <span>/</span> Transfer &amp; Representation Learning <span>/</span> Finite Element Analysis <span>/</span> Monte Carlo Validation <span>/</span> PCA</p></div>
-    <div class="sk-g rv"><h3>Signals &amp; DSP</h3><p>EEG <span>/</span> ECG <span>/</span> fNIRS &amp; DOT <span>/</span> FFT Algorithms <span>/</span> Real-Time Conditioning <span>/</span> Noise Filtering</p></div>
-    <div class="sk-g rv"><h3>Hardware</h3><p>STM32 <span>/</span> Arduino <span>/</span> ADXL345 <span>/</span> MPU6050 <span>/</span> BPW34 <span>/</span> KiCad <span>/</span> RS485 Modbus <span>/</span> I²C · SPI</p></div>
-    <div class="sk-g rv"><h3>Platforms</h3><p>TensorFlow <span>/</span> PyTorch <span>/</span> NumPy <span>/</span> ANSYS APDL <span>/</span> NIRFAST <span>/</span> Git <span>/</span> LaTeX</p></div>
+<!-- ══════════ 05 BENCH ══════════ -->
+<section class="sec" id="bench" data-sec="05 / Bench" data-el="P3">
+  <div class="shead"><span class="idn">05</span><span class="nm">Bench</span><span class="mono">Interactive — try them</span></div>
+  <p class="lede rv" data-split style="max-width:28ch;margin-bottom:clamp(34px,5vh,56px)">Three of these questions, <em>playable.</em></p>
+
+  <div class="bench">
+    <div class="bx rv">
+      <div class="bx-hd">
+        <span class="t">Seizure detector</span>
+        <span class="chip ok" id="szChip">Background</span>
+      </div>
+      <div class="bx-cv"><canvas id="szCv"></canvas></div>
+      <div class="bx-bd">
+        <div class="sld">
+          <label>Spike-wave burden <b id="szV">0%</b></label>
+          <input type="range" id="szSld" min="0" max="100" step="1" value="0">
+        </div>
+        <div>
+          <span class="mono" style="display:block;margin-bottom:6px">Detector confidence</span>
+          <div class="meter"><i id="szMeter"></i></div>
+        </div>
+        <p class="cap">Drag to inject 3 Hz spike-and-wave complexes into synthetic EEG. The readout is a thresholded band-ratio detector — the same principle as the 1D-CNN front end, stripped to something you can watch work.</p>
+      </div>
+    </div>
+
+    <div class="bx rv">
+      <div class="bx-hd">
+        <span class="t">Wet → dry transfer</span>
+        <span class="chip" id="trChip">—</span>
+      </div>
+      <div class="bx-cv"><canvas id="trCv"></canvas></div>
+      <div class="bx-bd">
+        <div class="sld">
+          <label>Labelled dry trials per subject <b id="trV">40</b></label>
+          <input type="range" id="trSld" min="0" max="160" step="4" value="40">
+        </div>
+        <p class="cap">Upper curve: participant-averaged accuracy against calibration budget, transfer versus dry-only baseline. Lower strip: <strong>per-subject change</strong> — every dot is one person, and the ones below the line are made worse. That asymmetry is the part a mean would hide, and reporting it is the point.</p>
+      </div>
+    </div>
+
+    <div class="bx rv">
+      <div class="bx-hd">
+        <span class="t">Photon sensitivity</span>
+        <span class="chip" id="pmChip">ρ = 30 mm</span>
+      </div>
+      <div class="bx-cv"><canvas id="pmCv"></canvas></div>
+      <div class="bx-bd">
+        <div class="sld">
+          <label>Source–detector separation <b id="pmV">30 mm</b></label>
+          <input type="range" id="pmSld" min="10" max="60" step="1" value="30">
+        </div>
+        <div class="sld">
+          <label>Reduced scattering μ′<sub>s</sub> <b id="pmMuV">1.0 mm⁻¹</b></label>
+          <input type="range" id="pmMu" min="4" max="20" step="1" value="10">
+        </div>
+        <p class="cap">The photon measurement density function — the banana. Wider separation reaches deeper but sees less; this is the geometry trade-off that decides whether fNIRS can read cortex at all.</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- ============ LEADERSHIP ============ -->
-<section id="leadership">
-  <div class="lead">
-    <div><div class="lbl"><span class="micro">Ⅵ — Beyond the lab</span></div></div>
+<!-- ══════════ 06 CAPABILITIES ══════════ -->
+<section class="sec" id="skills" data-sec="06 / Capabilities" data-el="O1">
+  <div class="shead"><span class="idn">06</span><span class="nm">Capabilities</span></div>
+  <div class="caps">
+    <div class="cap-g rv"><h3>Core</h3><p>Biomedical Signal Processing <span>/</span> Neural Decoding <span>/</span> Inverse Problems <span>/</span> Forward Modelling <span>/</span> Embedded Systems</p></div>
+    <div class="cap-g rv"><h3>Languages</h3><p>Python <span>/</span> MATLAB <span>/</span> C <span>/</span> C++ <span>/</span> Verilog <span>/</span> ARM Assembly <span>/</span> JavaScript <span>/</span> Java</p></div>
+    <div class="cap-g rv"><h3>Methods</h3><p>Transformers <span>/</span> 1D-CNNs <span>/</span> Transfer &amp; Representation Learning <span>/</span> Finite Element Analysis <span>/</span> Monte Carlo Validation <span>/</span> PCA</p></div>
+    <div class="cap-g rv"><h3>Signals</h3><p>EEG <span>/</span> ECG <span>/</span> fNIRS &amp; DOT <span>/</span> fMRI Encoding Models <span>/</span> FFT &amp; Goertzel <span>/</span> Real-Time Conditioning</p></div>
+    <div class="cap-g rv"><h3>Hardware</h3><p>STM32 <span>/</span> Arduino <span>/</span> ADXL345 <span>/</span> MPU6050 <span>/</span> BPW34 <span>/</span> KiCad <span>/</span> RS485 Modbus <span>/</span> I²C · SPI</p></div>
+    <div class="cap-g rv"><h3>Platforms</h3><p>TensorFlow <span>/</span> PyTorch <span>/</span> NumPy <span>/</span> ANSYS APDL <span>/</span> NIRFAST <span>/</span> Fusion 360 <span>/</span> Git <span>/</span> LaTeX</p></div>
+  </div>
+</section>
+
+<!-- ══════════ 07 BEYOND ══════════ -->
+<section class="sec" id="beyond" data-sec="07 / Beyond" data-el="T5">
+  <div class="grid-ab">
+    <div class="stick"><div class="shead"><span class="idn">07</span><span class="nm">Beyond</span></div></div>
     <div class="rv">
-      <h3>Institution's Innovation Council</h3>
-      <div class="l-org">VIT Vellore &nbsp;·&nbsp; A pan-India government initiative for innovation and startup culture &nbsp;·&nbsp; Apr 2024 — Jul 2025</div>
+      <h3 class="ser" style="font-size:clamp(1.42rem,3vw,2.2rem);line-height:1.16;margin-bottom:8px">Institution's Innovation Council</h3>
+      <div style="color:var(--acc);font-size:.88rem;margin-bottom:24px">VIT Vellore &nbsp;·&nbsp; A pan-India government initiative for innovation and startup culture &nbsp;·&nbsp; Apr 2024 — Jul 2025</div>
 
       <div class="roles">
         <div class="role">
-          <span class="r-n">01</span>
+          <span class="rn">01</span>
           <span>
-            <span class="r-t">Domain Head, Intellectual Property Rights — and concurrently Social Media Coordinator</span>
-            <span class="r-d">The only first-year student among the domain heads.</span>
+            <span class="rt">Domain Head, Intellectual Property Rights — and concurrently Social Media Coordinator</span>
+            <span class="rd">The only first-year student among the domain heads.</span>
           </span>
         </div>
-        <div class="role">
-          <span class="r-n">02</span>
-          <span><span class="r-t">Head of Events &amp; Operations</span></span>
-        </div>
-        <div class="role">
-          <span class="r-n">03</span>
-          <span><span class="r-t">Head of Human Resources</span></span>
-        </div>
+        <div class="role"><span class="rn">02</span><span><span class="rt">Head of Events &amp; Operations</span></span></div>
+        <div class="role"><span class="rn">03</span><span><span class="rt">Head of Human Resources</span></span></div>
       </div>
 
       <p class="li">Orchestrated Innovation Week 2025 — 17+ events, 2,000+ participants — across technology and research initiatives.</p>
@@ -867,142 +1132,1140 @@ section{padding:clamp(78px,12vh,150px) var(--pad)}
   </div>
 </section>
 
-<!-- ============ CONTACT ============ -->
-<section class="contact" id="contact">
-  <div class="lbl"><span class="micro">Ⅶ — Contact</span><span class="micro">Fall 2027 intake</span></div>
+<!-- ══════════ 08 CONTACT ══════════ -->
+<section class="sec" id="contact" data-sec="08 / Contact" data-el="O2">
+  <div class="shead"><span class="idn" style="color:var(--acc)">08</span><span class="nm">Contact</span><span class="mono">Fall 2027 intake</span></div>
   <h2 class="c-big rv" data-split>Seeking a direct PhD in <em>computational neuroscience</em> &amp; neural signal processing.</h2>
   <p class="c-sub rv">Applying for Fall 2027 entry. If your lab works on neural decoding, identifiability in non-invasive measurement, diffuse optical imaging, or physiological signal modelling — or you supervise in an adjacent area — I'd welcome a conversation.</p>
   <a class="c-mail" href="mailto:ivansarkar08@gmail.com">ivansarkar08@gmail.com</a>
-  <div class="c-links">
-    <a href="https://www.linkedin.com/in/abhranil-sarkar" target="_blank" rel="noopener">LinkedIn</a>
-    <a href="https://github.com/ivxn404" target="_blank" rel="noopener">GitHub</a>
-    <a href="tel:+919800949008">+91 98009 49008</a>
+  <div class="c-ls">
+    <a href="https://www.linkedin.com/in/abhranil-sarkar" target="_blank" rel="noopener"><span>LinkedIn</span></a>
+    <a href="https://github.com/ivxn404" target="_blank" rel="noopener"><span>GitHub</span></a>
+    <a href="tel:+919800949008"><span>+91 98009 49008</span></a>
+    <a href="mailto:abhranil.sarkar2023@vitstudent.ac.in"><span>VIT Mail</span></a>
   </div>
-  <div class="foot micro">
+  <div class="foot mono">
     <span>© MMXXVI Abhranil Sarkar</span>
-    <span>West Bengal, India</span>
+    <span>West Bengal, India → Singapore</span>
   </div>
 </section>
 
 <script>
-(function(){
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var fine   = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+'use strict';
+/* ══════════════════════════════════════════════════════════════
+   ABHRANIL SARKAR — INSTRUMENT
+   Single file. No dependencies. All visuals computed, not drawn.
+   ══════════════════════════════════════════════════════════════ */
 
-  /* ---- load ---- */
-  window.addEventListener('load', function(){ document.body.classList.add('loaded'); });
-  setTimeout(function(){ document.body.classList.add('loaded'); }, 900);
+const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FINE = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+let MOTION = !RM;
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
-  /* ---- split headlines into masked words ---- */
-  document.querySelectorAll('[data-split]').forEach(function(el){
-    var html = el.innerHTML;
-    var tmp = document.createElement('div'); tmp.innerHTML = html;
-    function walk(node, out){
-      node.childNodes.forEach(function(n){
-        if(n.nodeType===3){
-          n.textContent.split(/(\s+)/).forEach(function(w){
-            if(!w.trim()){ out.push(document.createTextNode(' ')); return; }
-            var s=document.createElement('span'); s.className='rw';
-            var b=document.createElement('b'); b.textContent=w; s.appendChild(b); out.push(s);
-          });
-        } else if(n.nodeType===1){
-          var clone=n.cloneNode(false); var kids=[]; walk(n,kids);
-          kids.forEach(function(k){clone.appendChild(k)}); out.push(clone);
-        }
+/* ───────── tiny helpers ───────── */
+/* storage can throw in private mode / sandboxed frames — never let it break the page */
+const store={
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
+  sget(k){ try{ return sessionStorage.getItem(k); }catch(e){ return null; } },
+  sset(k,v){ try{ sessionStorage.setItem(k,v); }catch(e){} }
+};
+/* ───────── scientific colormaps ─────────
+   Perceptual ramps, the same families used in neuroimaging figures.
+   cmap(name,t) -> 'rgb(r,g,b)' ; t clamped to 0..1                      */
+const RAMPS={
+  turbo:[[48,18,59],[64,91,201],[36,167,217],[47,214,153],[147,235,74],[228,203,51],[246,129,41],[197,42,17],[122,4,3]],
+  inferno:[[0,0,4],[31,12,72],[85,15,109],[136,34,106],[186,54,85],[227,89,51],[249,142,9],[252,202,60],[252,255,164]],
+  viridis:[[68,1,84],[72,40,120],[62,74,137],[49,104,142],[38,130,142],[31,158,137],[53,183,121],[110,206,88],[181,222,43],[253,231,37]],
+  plasma:[[13,8,135],[75,3,161],[125,3,168],[168,34,150],[203,70,121],[229,107,93],[248,148,65],[253,195,40],[240,249,33]],
+  magma:[[0,0,4],[28,16,68],[79,18,123],[129,37,129],[181,54,122],[229,80,100],[251,135,97],[254,194,135],[252,253,191]],
+  ice:[[3,5,18],[12,34,76],[12,74,124],[16,117,156],[32,163,170],[90,205,178],[168,232,196],[228,250,232]]
+};
+function cmap(name,t){
+  const R=RAMPS[name]||RAMPS.turbo;
+  t=t<0?0:t>1?1:t;
+  const x=t*(R.length-1), i=Math.min(R.length-2,Math.floor(x)), f=x-i;
+  const a=R[i], b=R[i+1];
+  return 'rgb('+Math.round(a[0]+(b[0]-a[0])*f)+','
+               +Math.round(a[1]+(b[1]-a[1])*f)+','
+               +Math.round(a[2]+(b[2]-a[2])*f)+')';
+}
+/* draw a small colormap key — authentic instrument furniture */
+function cbar(c,name,x,y,w,h,lo,hi){
+  for(let i=0;i<w;i++){ c.fillStyle=cmap(name,i/(w-1)); c.fillRect(x+i,y,1.4,h); }
+  c.fillStyle='#8A93AB'; c.font='500 6.5px "IBM Plex Mono", monospace';
+  if(lo) c.fillText(lo,x,y+h+7);
+  if(hi) c.fillText(hi,x+w-c.measureText(hi).width,y+h+7);
+}
+/* EEG channel palette — eight distinct hues */
+const CHCOL=['#22F0C8','#2FC4FF','#6E8BFF','#B07CFF','#FF4FD8','#FF4A22','#FFC234','#8DF553'];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const TAU=Math.PI*2;
+function mulberry(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rnd = mulberry(20261207);
+function gauss(r){let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(TAU*v);}
+
+/* ───────── canvas setup w/ DPR ───────── */
+function fit(cv){
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const r=cv.getBoundingClientRect();
+  const w=Math.max(1,Math.round(r.width*dpr)), h=Math.max(1,Math.round(r.height*dpr));
+  if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h;}
+  const c=cv.getContext('2d');
+  c.setTransform(dpr,0,0,dpr,0,0);
+  return {c,w:r.width,h:r.height};
+}
+
+/* ══════════════ RENDER SCHEDULER ══════════════
+   One rAF. Visible-only. Each job declares its own fps budget.    */
+const jobs=[];
+function addJob(el,draw,fps){
+  const j={el,draw,vis:false,fps:fps||30,last:0};
+  jobs.push(j);
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(es=>{es.forEach(e=>{j.vis=e.isIntersecting;});},{rootMargin:'120px'}).observe(el);
+  } else j.vis=true;
+  return j;
+}
+let T0=performance.now();
+function frame(now){
+  const t=(now-T0)/1000;
+  for(const j of jobs){
+    if(!j.vis) continue;
+    const iv=1000/j.fps;
+    if(now-j.last<iv) continue;
+    j.last=now;
+    try{ j.draw(t,now); }catch(e){}
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ══════════════ EEG SYNTHESIS ══════════════
+   Sum of band-limited oscillators + pink-ish noise + optional
+   3 Hz spike-and-wave. This is generated signal, not a drawn squiggle. */
+const BANDS=[{n:'δ',f:2.5,a:1.00},{n:'θ',f:6.0,a:0.62},{n:'α',f:10.0,a:0.80},{n:'β',f:20.0,a:0.34},{n:'γ',f:40.0,a:0.16}];
+const CHN=['Fp1','Fp2','F3','F4','C3','C4','P3','O1'];
+
+function makeChan(i){
+  const r=mulberry(1000+i*77);
+  return {
+    ph:BANDS.map(()=>r()*TAU),
+    df:BANDS.map(()=>0.86+r()*0.3),
+    amp:BANDS.map(()=>0.72+r()*0.58),
+    mod:BANDS.map(()=>({f:0.05+r()*0.22,p:r()*TAU})),
+    nz:[0,0,0,0],
+    nr:mulberry(7000+i*31)
+  };
+}
+const chans=CHN.map((_,i)=>makeChan(i));
+
+/* pink-ish noise: cascade of leaky integrators (Voss-ish) */
+function pink(ch){
+  const r=ch.nr;
+  ch.nz[0]=lerp(ch.nz[0],gauss(r),0.50);
+  ch.nz[1]=lerp(ch.nz[1],gauss(r),0.16);
+  ch.nz[2]=lerp(ch.nz[2],gauss(r),0.05);
+  ch.nz[3]=lerp(ch.nz[3],gauss(r),0.014);
+  return (ch.nz[0]*0.30+ch.nz[1]*0.42+ch.nz[2]*0.62+ch.nz[3]*0.90)*0.42;
+}
+
+/* 3 Hz spike-and-wave complex, burden b∈[0,1] */
+function spikeWave(t,b){
+  if(b<=0) return 0;
+  const p=(t*3)%1;                        // 3 Hz
+  const spike=Math.exp(-Math.pow((p-0.10)/0.030,2))*2.9;
+  const wave=-Math.sin(Math.PI*clamp((p-0.16)/0.62,0,1))*1.25;
+  return (spike+wave)*b;
+}
+
+let SW_HERO=0, SW_PULSE=0;
+function eegSample(ci,t,burden){
+  const ch=chans[ci]; let v=0;
+  for(let k=0;k<BANDS.length;k++){
+    const B=BANDS[k], m=ch.mod[k];
+    const env=0.55+0.45*Math.sin(t*m.f*TAU+m.p);
+    v+=Math.sin(t*B.f*ch.df[k]*TAU+ch.ph[k])*B.a*ch.amp[k]*env;
+  }
+  v+=pink(ch);
+  v+=spikeWave(t+ci*0.012,burden);
+  return v*0.5;
+}
+
+/* Goertzel — real single-bin power, cheap. */
+function goertzel(buf,f,fs){
+  const n=buf.length, k=TAU*f/fs, cw=Math.cos(k), coeff=2*cw;
+  let s0=0,s1=0,s2=0;
+  for(let i=0;i<n;i++){s0=buf[i]+coeff*s1-s2;s2=s1;s1=s0;}
+  return Math.sqrt(Math.max(0,s1*s1+s2*s2-coeff*s1*s2))/n;
+}
+
+/* ══════════════ HERO: 8-CHANNEL MONTAGE ══════════════ */
+(function heroEEG(){
+  const cv=document.getElementById('eegBg'); if(!cv) return;
+  const FS=90, SPAN=5.2;                 // visual sample rate / seconds on screen
+  const N=Math.round(FS*SPAN);
+  const buf=CHN.map(()=>new Float32Array(N));
+  let head=0, tAcc=0, lastT=0;
+  let COL=CHCOL.slice(), BLOOM=+css('--bloom')||0;
+  window.addEventListener('themechange',()=>{ BLOOM=+css('--bloom')||0; });
+
+  // band readout DOM
+  const wrap=document.getElementById('bandsRd');
+  const bEls=BANDS.map(B=>{
+    const d=document.createElement('div'); d.className='band';
+    d.innerHTML='<span class="bl">'+B.n+'</span><span class="bb"><i></i></span><span class="bv">—</span>';
+    wrap&&wrap.appendChild(d);
+    return {i:d.querySelector('i'),v:d.querySelector('.bv'),f:B.f};
+  });
+  let bAcc=0;
+
+  addJob(cv,(t)=>{
+    const {c,w,h}=fit(cv);
+    const dt=Math.min(0.05,t-lastT); lastT=t;
+    // advance buffers at FS
+    tAcc+=dt;
+    const steps=Math.min(24,Math.floor(tAcc*FS));
+    tAcc-=steps/FS;
+    SW_PULSE=Math.max(0,SW_PULSE-dt*0.55);
+    const burden=Math.max(SW_HERO,SW_PULSE);
+    for(let s=0;s<steps;s++){
+      const tt=t-(steps-s)/FS;
+      for(let i=0;i<CHN.length;i++) buf[i][head]=eegSample(i,tt,burden);
+      head=(head+1)%N;
+    }
+    c.clearRect(0,0,w,h);
+    const n=CHN.length, pad=h*0.055, gap=(h-pad*2)/n;
+    const amp=Math.min(gap*0.46,30);
+    c.lineWidth=1.15; c.lineJoin='round';
+    for(let i=0;i<n;i++){
+      const y0=pad+gap*(i+0.5);
+      c.strokeStyle=COL[i];
+      if(BLOOM){ c.shadowColor=COL[i]; c.shadowBlur=9; }
+      c.globalAlpha=0.72;
+      c.beginPath();
+      for(let s=0;s<N;s++){
+        const v=buf[i][(head+s)%N];
+        const x=(s/(N-1))*w, y=y0-v*amp;
+        s?c.lineTo(x,y):c.moveTo(x,y);
+      }
+      c.stroke();
+      c.shadowBlur=0;
+      // channel label
+      c.globalAlpha=0.55; c.fillStyle=COL[i];
+      c.font='500 8.5px "IBM Plex Mono", monospace';
+      c.fillText(CHN[i],6,y0-amp-3);
+    }
+    c.globalAlpha=1;
+
+    // band powers every ~130ms from Fp1
+    bAcc+=dt;
+    if(bAcc>0.13){
+      bAcc=0;
+      const lin=new Float32Array(N);
+      for(let s=0;s<N;s++) lin[s]=buf[0][(head+s)%N];
+      /* relative band share — 1/f means raw magnitudes are incomparable */
+      const pw=bEls.map(b=>goertzel(lin,b.f,FS));
+      const sum=pw.reduce((a,b)=>a+b,0)||1e-9;
+      const mx=Math.max.apply(null,pw)||1e-9;
+      bEls.forEach((b,i)=>{
+        b.i.style.height=clamp(pw[i]/mx*100,5,100).toFixed(0)+'%';
+        b.v.textContent=Math.round(pw[i]/sum*100)+'%';
       });
     }
-    var out=[]; walk(tmp,out);
-    el.innerHTML=''; out.forEach(function(n){el.appendChild(n)});
-    var d=0;
-    el.querySelectorAll('.rw>b,.rw>i').forEach(function(b){
-      b.style.transitionDelay=(d+=0.035).toFixed(3)+'s';
-    });
-  });
-
-  /* ---- reveal ---- */
-  var io=new IntersectionObserver(function(es){
-    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
-  },{threshold:.12,rootMargin:'0px 0px -8% 0px'});
-  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
-
-  /* ---- experience accordion ---- */
-  document.querySelectorAll('.xhead').forEach(function(h){
-    function toggle(){
-      var row=h.closest('.xrow'), open=row.classList.toggle('open');
-      h.setAttribute('aria-expanded', open?'true':'false');
-    }
-    h.addEventListener('click', toggle);
-    h.addEventListener('keydown', function(e){
-      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); }
-    });
-  });
-
-  /* ---- hide topbar on scroll down + invert over dark section ---- */
-  var last=0, bar=document.getElementById('topbar'), dark=document.getElementById('contact');
-  window.addEventListener('scroll', function(){
-    var y=window.scrollY;
-    bar.classList.toggle('hide', y>last && y>420);
-    last=y;
-    if(dark){
-      var r=dark.getBoundingClientRect();
-      bar.classList.toggle('on-dark', r.top<=56 && r.bottom>=0);
-    }
-  }, {passive:true});
-
-  /* ---- horizontal work section ---- */
-  var wrap=document.getElementById('hwrap'),
-      track=document.getElementById('htrack'),
-      prog=document.getElementById('hprog'),
-      travel=0, cur=0, target=0, raf=null;
-
-  function measure(){
-    if(window.innerWidth<=900||reduce){
-      wrap.style.height=''; track.style.transform=''; return;
-    }
-    travel = track.scrollWidth - window.innerWidth;
-    if(travel<0) travel=0;
-    wrap.style.height=(travel + window.innerHeight)+'px';
-  }
-  function onScroll(){
-    if(window.innerWidth<=900||reduce||!travel) return;
-    var top=wrap.getBoundingClientRect().top;
-    var p=Math.min(Math.max(-top/travel,0),1);
-    target=p*travel;
-    if(prog) prog.style.width=(p*100)+'%';
-    if(!raf) raf=requestAnimationFrame(tick);
-  }
-  function tick(){
-    cur += (target-cur)*0.12;
-    if(Math.abs(target-cur)<0.4){ cur=target; raf=null; }
-    else raf=requestAnimationFrame(tick);
-    track.style.transform='translate3d('+(-cur)+'px,0,0)';
-  }
-  measure(); onScroll();
-  window.addEventListener('scroll', onScroll, {passive:true});
-  window.addEventListener('resize', function(){ measure(); onScroll(); });
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ measure(); onScroll(); });
-
-  /* ---- custom cursor ---- */
-  if(fine && !reduce){
-    var dot=document.querySelector('.cur'), ring=document.querySelector('.cur-ring'),
-        mx=0,my=0,rx=0,ry=0;
-    document.addEventListener('mousemove', function(e){
-      mx=e.clientX; my=e.clientY;
-      dot.style.transform='translate3d('+mx+'px,'+my+'px,0)';
-      document.body.classList.add('cur-on');
-    });
-    (function loop(){
-      rx+=(mx-rx)*0.16; ry+=(my-ry)*0.16;
-      ring.style.transform='translate3d('+rx+'px,'+ry+'px,0)';
-      requestAnimationFrame(loop);
-    })();
-    document.querySelectorAll('a,button,.xhead,[role="button"]').forEach(function(el){
-      el.addEventListener('mouseenter',function(){document.body.classList.add('cur-hover')});
-      el.addEventListener('mouseleave',function(){document.body.classList.remove('cur-hover')});
-    });
-    document.addEventListener('mouseleave',function(){document.body.classList.remove('cur-on')});
-  }
+  },38);
 })();
+
+/* ══════════════ COLOUR SCHEME ══════════════ */
+(function scheme(){
+  const root=document.documentElement, bt=document.getElementById('btnTheme');
+  const saved=store.get('as_theme');
+  if(saved) root.setAttribute('data-theme',saved);
+  function sync(){
+    const dark=root.getAttribute('data-theme')==='instrument';
+    if(bt) bt.textContent=dark?'Light':'Dark';
+    const m=document.querySelector('meta[name=theme-color]');
+    if(m) m.setAttribute('content',dark?'#0E1117':'#FBFAF7');
+    window.dispatchEvent(new Event('themechange'));
+  }
+  sync();
+  if(bt) bt.addEventListener('click',()=>{
+    const dark=root.getAttribute('data-theme')==='instrument';
+    root.setAttribute('data-theme',dark?'paper':'instrument');
+    store.set('as_theme',dark?'paper':'instrument');
+    sync();
+  });
+})();
+
+/* ══════════════ SECTION TRACKING + MONTAGE NAV ══════════════ */
+(function nav(){
+  const secs=[...document.querySelectorAll('[data-sec]')];
+  const dots=document.getElementById('montageDots'), tip=document.getElementById('montageTip');
+  const POS=[[50,20],[32,33],[50,37],[30,56],[50,56],[70,56],[32,79],[50,92],[70,79]];
+  const made=[];
+  if(dots) secs.forEach((sec,i)=>{
+    const p=POS[i]||[50,56];
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    const ci=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ci.setAttribute('cx',p[0]);ci.setAttribute('cy',p[1]);ci.setAttribute('r',3.4);
+    ci.setAttribute('class','el-dot');
+    const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+    tx.setAttribute('x',p[0]);tx.setAttribute('y',p[1]-5.6);tx.setAttribute('class','el-lab');
+    tx.textContent=sec.dataset.el||'';
+    ci.addEventListener('click',()=>sec.scrollIntoView({behavior:RM?'auto':'smooth'}));
+    ci.addEventListener('mouseenter',()=>{ if(tip){tip.textContent=sec.dataset.sec;tip.style.opacity='1';tip.style.top=(p[1]/112*100)+'%';} });
+    ci.addEventListener('mouseleave',()=>{ if(tip) tip.style.opacity='0'; });
+    g.appendChild(ci);g.appendChild(tx);dots.appendChild(g);
+    made.push(ci);
+  });
+  const links=[...document.querySelectorAll('.topnav a')];
+  let cur=-1;
+  function onScroll(){
+    let idx=0;
+    for(let i=0;i<secs.length;i++){ if(secs[i].getBoundingClientRect().top<=innerHeight*0.42) idx=i; }
+    if(idx===cur) return;
+    cur=idx;
+    made.forEach((d,i)=>d.classList.toggle('cur',i===idx));
+    const id=secs[idx].id;
+    links.forEach(a=>a.classList.toggle('cur',a.getAttribute('href')==='#'+id));
+  }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+})();
+
+/* ══════════════ REVEAL + WORD SPLIT ══════════════ */
+(function reveal(){
+  document.querySelectorAll('[data-split]').forEach(el=>{
+    const tmp=document.createElement('div'); tmp.innerHTML=el.innerHTML;
+    const out=[];
+    (function walk(node,acc){
+      node.childNodes.forEach(n=>{
+        if(n.nodeType===3){
+          n.textContent.split(/(\s+)/).forEach(w=>{
+            if(!w.trim()){acc.push(document.createTextNode(' '));return;}
+            const s=document.createElement('span'); s.className='rw';
+            const b=document.createElement('b'); b.textContent=w; s.appendChild(b); acc.push(s);
+          });
+        } else if(n.nodeType===1){
+          const cl=n.cloneNode(false), kids=[]; walk(n,kids);
+          kids.forEach(k=>cl.appendChild(k)); acc.push(cl);
+        }
+      });
+    })(tmp,out);
+    el.innerHTML=''; out.forEach(n=>el.appendChild(n));
+    let d=0;
+    el.querySelectorAll('.rw>b').forEach(b=>{ b.style.transitionDelay=(d+=0.034).toFixed(3)+'s'; });
+  });
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:.12,rootMargin:'0px 0px -7% 0px'});
+  document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+})();
+
+/* ══════════════ EXPERIENCE ACCORDION ══════════════ */
+document.querySelectorAll('.xh').forEach(h=>{
+  const t=()=>{ const r=h.closest('.xr'); h.setAttribute('aria-expanded',r.classList.toggle('open')?'true':'false'); };
+  h.addEventListener('click',t);
+  h.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();t();} });
+});
+
+/* ══════════════ HORIZONTAL TRACK ══════════════ */
+(function horiz(){
+  const wrap=document.getElementById('hw'), track=document.getElementById('ht'), fill=document.getElementById('hbarFill');
+  if(!wrap||!track) return;
+  let travel=0, cur=0, tgt=0, raf=null;
+  function measure(){
+    if(innerWidth<=860||RM){ wrap.style.height=''; track.style.transform=''; travel=0; return; }
+    travel=Math.max(0,track.scrollWidth-innerWidth);
+    wrap.style.height=(travel+innerHeight)+'px';
+  }
+  function onS(){
+    if(!travel) return;
+    const p=clamp(-wrap.getBoundingClientRect().top/travel,0,1);
+    tgt=p*travel;
+    if(fill) fill.style.width=(p*100)+'%';
+    if(!raf) raf=requestAnimationFrame(step);
+  }
+  function step(){
+    cur=lerp(cur,tgt,0.13);
+    if(Math.abs(tgt-cur)<0.4){cur=tgt;raf=null;} else raf=requestAnimationFrame(step);
+    track.style.transform='translate3d('+(-cur).toFixed(2)+'px,0,0)';
+  }
+  measure(); onS();
+  addEventListener('scroll',onS,{passive:true});
+  addEventListener('resize',()=>{measure();onS();});
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{measure();onS();});
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   IDENTIFIABILITY LAB
+   Two dipole sources inside a head cross-section, projected onto a
+   16-electrode ring through a simplified single-layer dipole kernel.
+   Skull = spatial low-pass on the scalp pattern (qualitatively right:
+   the skull smears high spatial frequencies).
+   κ = σmax/σmin of the 2-column lead-field, from the 2×2 Gram matrix.
+   ══════════════════════════════════════════════════════════════ */
+(function lab(){
+  const stage=document.getElementById('labStage'), cv=document.getElementById('labCv');
+  if(!stage||!cv) return;
+  const NE=16, SRC_R=0.70;
+  /* parametric pair on an arc — verified geometry (see note) */
+  function pairAt(sep){
+    const phi=(2+sep*44)*Math.PI/180, base=Math.PI/2;
+    return [{x:Math.cos(base+phi)*SRC_R,y:Math.sin(base+phi)*SRC_R},
+            {x:Math.cos(base-phi)*SRC_R,y:Math.sin(base-phi)*SRC_R}];
+  }
+  let src=pairAt(0.35), skull=6.5, drag=-1;
+
+  const elK=document.getElementById('labKappa'), elC=document.getElementById('labCorr'),
+        elV=document.getElementById('labVerdict'),
+        sK=document.getElementById('labSkull'), sKv=document.getElementById('labSkullV'),
+        sS=document.getElementById('labSep'), sSv=document.getElementById('labSepV'),
+        rst=document.getElementById('labReset');
+
+  /* electrode ring in normalised head coords (unit circle) */
+  const ePos=[];
+  for(let i=0;i<NE;i++){const a=-Math.PI/2+i/NE*TAU;ePos.push({x:Math.cos(a),y:Math.sin(a),a});}
+
+  /* free-space dipole kernel: V ∝ p·(r−r0)/|r−r0|³, moment radial from centre */
+  function pattern(s){
+    const out=new Float64Array(NE);
+    const rr=Math.hypot(s.x,s.y)||1e-6;
+    // dipole moment: radial orientation, magnitude scaled by depth control
+    const px=s.x/rr, py=s.y/rr;
+    for(let i=0;i<NE;i++){
+      const dx=ePos[i].x-s.x, dy=ePos[i].y-s.y;
+      const d=Math.max(0.06,Math.hypot(dx,dy));
+      out[i]=(px*dx+py*dy)/(d*d*d);
+    }
+    return out;
+  }
+  /* skull low-pass: circular Gaussian smoothing, width ∝ thickness */
+  function smooth(v,mm){
+    const sg=Math.max(0.30,mm*0.42);            // in electrode units
+    const half=Math.min(NE>>1,Math.ceil(sg*2.8));
+    const w=[];let wsum=0;
+    for(let k=-half;k<=half;k++){const g=Math.exp(-0.5*(k/sg)*(k/sg));w.push(g);wsum+=g;}
+    const o=new Float64Array(NE);
+    for(let i=0;i<NE;i++){
+      let a=0;
+      for(let k=-half,j=0;k<=half;k++,j++){ a+=v[(i+k+NE*4)%NE]*w[j]; }
+      o[i]=a/wsum;
+    }
+    // skull also attenuates overall amplitude
+    const att=Math.exp(-mm*0.055);
+    for(let i=0;i<NE;i++) o[i]*=att;
+    return o;
+  }
+  const dot=(a,b)=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return s;};
+
+  let KAPPA=1, CORR=0, A1=null, A2=null;
+  function solve(){
+    /* κ is scale-invariant, so no global multipliers here — the only
+       things that move it are geometry and the skull low-pass.        */
+    A1=smooth(pattern(src[0]),skull); A2=smooth(pattern(src[1]),skull);
+    const g11=dot(A1,A1), g22=dot(A2,A2), g12=dot(A1,A2);
+    const tr=g11+g22, det=g11*g22-g12*g12;
+    const disc=Math.max(0,tr*tr-4*det);
+    const l1=(tr+Math.sqrt(disc))/2, l2=(tr-Math.sqrt(disc))/2;
+    KAPPA=l2>1e-14?Math.sqrt(l1/l2):1e9;
+    CORR=(g11>0&&g22>0)?g12/Math.sqrt(g11*g22):0;
+  }
+  function paintUI(){
+    const k=KAPPA;
+    elK.textContent=k>=1e6?'∞':(k>=1000?Math.round(k).toLocaleString():k.toFixed(1));
+    elK.className='n '+(k<4?'good':k<12?'warn':'bad');
+    elC.textContent=(CORR>=0?'+':'')+CORR.toFixed(4);
+    elC.className='n '+(Math.abs(CORR)<0.9?'good':Math.abs(CORR)<0.99?'warn':'bad');
+    elV.textContent=k>=12?'Non-identifiable':(k>=4?'Ill-conditioned':'Separable');
+    elV.className='verdict '+(k>=4?'no':'ok');
+  }
+
+  function toLocal(ev){
+    const r=stage.getBoundingClientRect();
+    const cx=r.width/2, cy=r.height/2, R=Math.min(r.width,r.height)*0.40;
+    const px=(ev.clientX-r.left-cx)/R, py=(ev.clientY-r.top-cy)/R;
+    return {x:px,y:py,R,cx,cy};
+  }
+  function pick(ev){
+    const p=toLocal(ev);
+    let best=-1,bd=1e9;
+    src.forEach((s,i)=>{const d=Math.hypot(s.x-p.x,s.y-p.y);if(d<bd){bd=d;best=i;}});
+    return bd<0.22?best:-1;
+  }
+  stage.addEventListener('pointerdown',e=>{
+    drag=pick(e);
+    if(drag>=0){ stage.setPointerCapture(e.pointerId); e.preventDefault(); }
+  });
+  stage.addEventListener('pointermove',e=>{
+    if(drag<0) return;
+    const p=toLocal(e);
+    const r=Math.hypot(p.x,p.y);
+    const lim=0.80;
+    src[drag].x=r>lim?p.x/r*lim:p.x;
+    src[drag].y=r>lim?p.y/r*lim:p.y;
+  });
+  const up=()=>{drag=-1;};
+  stage.addEventListener('pointerup',up); stage.addEventListener('pointercancel',up);
+
+  sK.addEventListener('input',()=>{skull=+sK.value;sKv.textContent=skull.toFixed(1)+' mm';});
+  function applySep(){
+    const sep=+sS.value/100;
+    src=pairAt(sep);
+    sSv.textContent=(2+sep*44).toFixed(1)+'°';
+  }
+  sS.addEventListener('input',applySep);
+  rst.addEventListener('click',()=>{
+    sK.value=6.5; skull=6.5; sKv.textContent='6.5 mm';
+    sS.value=35; applySep();
+  });
+
+  addJob(cv,(t)=>{
+    solve(); paintUI();
+    const {c,w,h}=fit(cv);
+    const cx=w/2, cy=h/2, R=Math.min(w,h)*0.40;
+    c.clearRect(0,0,w,h);
+
+    /* interior scalar field: superposition, rendered as coarse blocks */
+    const step=Math.max(5,Math.round(Math.min(w,h)/52));
+    for(let y=0;y<h;y+=step){
+      for(let x=0;x<w;x+=step){
+        const nx=(x+step/2-cx)/R, ny=(y+step/2-cy)/R;
+        if(nx*nx+ny*ny>1) continue;
+        let v=0;
+        for(const s of src){
+          const rr=Math.hypot(s.x,s.y)||1e-6;
+          const dx=nx-s.x, dy=ny-s.y, d=Math.max(0.07,Math.hypot(dx,dy));
+          v+=((s.x/rr)*dx+(s.y/rr)*dy)/(d*d*d);
+        }
+        const a=clamp(Math.abs(v)*0.020,0,1);
+        c.fillStyle=cmap(v>0?'inferno':'ice',0.18+a*0.82);
+        c.globalAlpha=0.20+a*0.70; c.fillRect(x,y,step,step);
+      }
+    }
+    c.globalAlpha=1;
+
+    /* skull band */
+    c.strokeStyle=css('--scr-line2'); c.lineWidth=Math.max(1.5,skull*0.9);
+    c.globalAlpha=.65; c.beginPath(); c.arc(cx,cy,R+c.lineWidth/2+1,0,TAU); c.stroke();
+    c.globalAlpha=1;
+    c.strokeStyle=css('--scr-line'); c.lineWidth=1;
+    c.beginPath(); c.arc(cx,cy,R,0,TAU); c.stroke();
+    c.beginPath(); c.arc(cx,cy,R*0.70,0,TAU); c.globalAlpha=.5; c.stroke(); c.globalAlpha=1;
+
+    /* electrodes + the two scalp patterns as radial bars */
+    let mx=1e-9; for(let i=0;i<NE;i++) mx=Math.max(mx,Math.abs(A1[i]),Math.abs(A2[i]));
+    const rOut=R+Math.max(1.5,skull*0.9)+5;
+    for(let i=0;i<NE;i++){
+      const e=ePos[i], ex=cx+e.x*rOut, ey=cy+e.y*rOut;
+      // bars
+      const b1=A1[i]/mx*R*0.30, b2=A2[i]/mx*R*0.30;
+      c.lineWidth=2.6; c.lineCap='round';
+      c.strokeStyle='#FF4A22'; c.globalAlpha=.9;
+      c.beginPath(); c.moveTo(ex,ey); c.lineTo(cx+e.x*(rOut+Math.abs(b1)),cy+e.y*(rOut+Math.abs(b1))); c.stroke();
+      c.strokeStyle='#22F0C8'; c.globalAlpha=.9;
+      c.beginPath();
+      c.moveTo(cx+e.x*(rOut+2),cy+e.y*(rOut+2));
+      c.lineTo(cx+e.x*(rOut+2+Math.abs(b2)),cy+e.y*(rOut+2+Math.abs(b2)));
+      c.stroke();
+      c.globalAlpha=1;
+      c.fillStyle=css('--scr-fg2'); c.beginPath(); c.arc(ex,ey,2,0,TAU); c.fill();
+    }
+
+    /* sources */
+    src.forEach((s,i)=>{
+      const sx=cx+s.x*R, sy=cy+s.y*R;
+      const col=i===0?'#FF4A22':'#22F0C8';
+      const pulse=MOTION?(0.8+0.2*Math.sin(t*3+i*2)):1;
+      c.strokeStyle=col; c.lineWidth=1.3; c.globalAlpha=.55;
+      c.beginPath(); c.arc(sx,sy,12*pulse,0,TAU); c.stroke();
+      c.globalAlpha=1;
+      c.fillStyle=col; c.beginPath(); c.arc(sx,sy,5,0,TAU); c.fill();
+      // moment arrow (radial)
+      const rr=Math.hypot(s.x,s.y)||1e-6;
+      c.strokeStyle=col; c.lineWidth=1.6;
+      c.beginPath(); c.moveTo(sx,sy);
+      c.lineTo(sx+(s.x/rr)*17,sy+(s.y/rr)*17); c.stroke();
+      c.fillStyle=col; c.font='500 9px "IBM Plex Mono", monospace';
+      c.fillText('q'+(i+1),sx+8,sy-9);
+    });
+
+    /* overlap warning */
+    if(KAPPA>=12){
+      c.strokeStyle='#FF4A22'; c.globalAlpha=.3+(MOTION?0.2*Math.sin(t*5):0);
+      c.lineWidth=2; c.strokeRect(1,1,w-2,h-2); c.globalAlpha=1;
+    }
+  },26);
+})();
+
+/* ══════════════ BENCH 1 — SEIZURE DETECTOR ══════════════ */
+(function sz(){
+  const cv=document.getElementById('szCv'), sld=document.getElementById('szSld'),
+        v=document.getElementById('szV'), chip=document.getElementById('szChip'),
+        meter=document.getElementById('szMeter');
+  if(!cv) return;
+  const FS=110, N=Math.round(FS*4.2);
+  const buf=new Float32Array(N); let head=0, tAcc=0, lastT=0, burden=0, conf=0;
+  sld.addEventListener('input',()=>{burden=+sld.value/100;v.textContent=sld.value+'%';});
+  const ch=makeChan(99);
+  addJob(cv,(t)=>{
+    const {c,w,h}=fit(cv);
+    const dt=Math.min(.05,t-lastT); lastT=t;
+    tAcc+=dt; const steps=Math.min(26,Math.floor(tAcc*FS)); tAcc-=steps/FS;
+    for(let s=0;s<steps;s++){
+      const tt=t-(steps-s)/FS;
+      let x=0;
+      for(let k=0;k<BANDS.length;k++) x+=Math.sin(tt*BANDS[k].f*TAU+ch.ph[k])*BANDS[k].a*ch.amp[k];
+      x+=pink(ch); x+=spikeWave(tt,burden);
+      buf[head]=x*0.5; head=(head+1)%N;
+    }
+    const lin=new Float32Array(N);
+    for(let s=0;s<N;s++) lin[s]=buf[(head+s)%N];
+    // band-ratio detector: (2–4 Hz spike-wave energy) vs broadband
+    const p3=goertzel(lin,3,FS)+goertzel(lin,6,FS)*0.6+goertzel(lin,9,FS)*0.4;
+    const pb=goertzel(lin,10,FS)+goertzel(lin,16,FS)+goertzel(lin,24,FS)+1e-6;
+    const ratio=p3/pb;
+    const target=clamp((ratio-1.15)/2.1,0,1);
+    conf=lerp(conf,target,0.16);
+    meter.style.width=(conf*100).toFixed(0)+'%';
+    meter.className=conf>0.5?'hi':'';
+    const sez=conf>0.5;
+    chip.textContent=sez?'Seizure':'Background';
+    chip.className='chip '+(sez?'no':'ok');
+
+    c.clearRect(0,0,w,h);
+    // spectrogram strip (top 38%)
+    const SH=h*0.38;
+    const freqs=[2,3,4,6,8,10,13,17,22,30];
+    const colw=w/44;
+    if(!cv._spec){cv._spec=[];}
+    const colv=freqs.map(f=>goertzel(lin,f,FS));
+    cv._spec.push(colv); if(cv._spec.length>44) cv._spec.shift();
+    let smax=1e-6; cv._spec.forEach(cl=>cl.forEach(x=>{if(x>smax)smax=x;}));
+    cv._spec.forEach((cl,ci)=>{
+      cl.forEach((val,fi)=>{
+        const a=clamp(val/smax,0,1);
+        c.fillStyle=cmap('turbo',a);
+        c.globalAlpha=0.16+a*0.80;
+        c.fillRect(ci*colw,SH-(fi+1)*(SH/freqs.length),colw+.6,SH/freqs.length+.6);
+      });
+    });
+    c.globalAlpha=1;
+    c.strokeStyle=css('--scr-line'); c.lineWidth=1;
+    c.beginPath();c.moveTo(0,SH);c.lineTo(w,SH);c.stroke();
+    c.fillStyle=css('--scr-fg2'); c.font='500 7.5px "IBM Plex Mono", monospace';
+    c.fillText('2–30 Hz',4,10);
+    cbar(c,'turbo',w-62,5,54,4);
+    // waveform
+    const y0=SH+(h-SH)/2, amp=(h-SH)*0.37;
+    c.strokeStyle=sez?'#FF4A22':'#22F0C8'; c.lineWidth=1.6;
+    c.shadowColor=sez?'#FF4A22':'#22F0C8'; c.shadowBlur=7; c.beginPath();
+    for(let s=0;s<N;s++){
+      const x=s/(N-1)*w, y=y0-lin[s]*amp;
+      s?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.stroke(); c.shadowBlur=0;
+  },32);
+})();
+
+/* ══════════════ BENCH 2 — WET→DRY TRANSFER ══════════════ */
+(function tr(){
+  const cv=document.getElementById('trCv'), sld=document.getElementById('trSld'),
+        v=document.getElementById('trV'), chip=document.getElementById('trChip');
+  if(!cv) return;
+  const NS=40;
+  // per-subject latent traits: baseline skill, transferability (can be negative)
+  const subs=[];
+  { const r=mulberry(424242);
+    for(let i=0;i<NS;i++) subs.push({b:0.46+r()*0.13, g:gauss(r)*0.085+0.052, k:14+r()*44});
+  }
+  let budget=40;
+  const accDry=(s,n)=>s.b+ (0.40-s.b*0.42) * (n/(n+s.k));
+  const accTr=(s,n)=>clamp(accDry(s,n)+s.g*(1-n/(n+s.k*1.9)),0.02,0.985);
+  sld.addEventListener('input',()=>{budget=+sld.value;v.textContent=budget;});
+  addJob(cv,()=>{
+    const {c,w,h}=fit(cv);
+    c.clearRect(0,0,w,h);
+    const padL=30,padR=8,padT=10;
+    const CH=h*0.58, SH=h-CH-14;
+    const x0=padL,x1=w-padR;
+    const NMAX=160;
+    const X=n=>x0+(n/NMAX)*(x1-x0);
+    const Y=a=>padT+(1-(a-0.40)/0.52)*(CH-padT-10);
+
+    // grid
+    c.strokeStyle=css('--scr-line');c.lineWidth=1;
+    [0.5,0.6,0.7,0.8,0.9].forEach(a=>{
+      c.globalAlpha=.6;c.beginPath();c.moveTo(x0,Y(a));c.lineTo(x1,Y(a));c.stroke();c.globalAlpha=1;
+      c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+      c.fillText((a*100).toFixed(0),4,Y(a)+2.5);
+    });
+    // mean curves
+    function mean(fn,n){let s=0;for(const u of subs)s+=fn(u,n);return s/NS;}
+    [['#8A93AB',accDry],['#22F0C8',accTr]].forEach(([col,fn])=>{
+      c.strokeStyle=col;c.lineWidth=fn===accTr?2.2:1.3;
+      if(fn===accDry)c.setLineDash([3,3]);
+      else { c.shadowColor=col; c.shadowBlur=8; }
+      c.beginPath();
+      for(let n=0;n<=NMAX;n+=4){const y=Y(mean(fn,n));n?c.lineTo(X(n),y):c.moveTo(X(n),y);}
+      c.stroke();c.setLineDash([]);c.shadowBlur=0;
+    });
+    // budget marker
+    c.strokeStyle='#FFC234';c.lineWidth=1;c.setLineDash([2,3]);
+    c.beginPath();c.moveTo(X(budget),padT);c.lineTo(X(budget),CH);c.stroke();c.setLineDash([]);
+    const mt=mean(accTr,budget), md=mean(accDry,budget);
+    c.fillStyle='#22F0C8';c.beginPath();c.arc(X(budget),Y(mt),3.4,0,TAU);c.fill();
+    c.fillStyle=css('--scr-fg2');c.beginPath();c.arc(X(budget),Y(md),3,0,TAU);c.fill();
+    c.fillStyle=css('--scr-fg');c.font='500 7.5px "IBM Plex Mono", monospace';
+    c.fillText('transfer '+(mt*100).toFixed(1)+'%',X(budget)+6,Y(mt)-4);
+    c.fillText('dry only '+(md*100).toFixed(1)+'%',X(budget)+6,Y(md)+11);
+
+    // per-subject delta strip
+    const sy=CH+SH/2+8;
+    c.strokeStyle=css('--scr-line');c.beginPath();c.moveTo(x0,sy);c.lineTo(x1,sy);c.stroke();
+    c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+    c.fillText('Δ per subject',4,CH+12);
+    let worse=0, dmax=1e-6;
+    const ds=subs.map(u=>{const d=accTr(u,budget)-accDry(u,budget);if(d<0)worse++;dmax=Math.max(dmax,Math.abs(d));return d;});
+    ds.forEach((d,i)=>{
+      const x=x0+((i+0.5)/NS)*(x1-x0);
+      const y=sy-(d/dmax)*(SH*0.40);
+      c.strokeStyle=d<0?'#FF4A22':'#22F0C8';c.globalAlpha=.7;c.lineWidth=1;
+      c.beginPath();c.moveTo(x,sy);c.lineTo(x,y);c.stroke();c.globalAlpha=1;
+      c.fillStyle=d<0?'#FF4A22':'#22F0C8';
+      c.beginPath();c.arc(x,y,2.1,0,TAU);c.fill();
+    });
+    chip.textContent=worse+' / '+NS+' worse off';
+    chip.className='chip '+(worse>0?'no':'ok');
+  },12);
+})();
+
+/* ══════════════ BENCH 3 — PHOTON PMDF ══════════════ */
+(function pm(){
+  const cv=document.getElementById('pmCv'), sld=document.getElementById('pmSld'),
+        v=document.getElementById('pmV'), mu=document.getElementById('pmMu'),
+        muv=document.getElementById('pmMuV'), chip=document.getElementById('pmChip');
+  if(!cv) return;
+  let rho=30, musp=1.0;
+  const mua=0.01;
+  sld.addEventListener('input',()=>{rho=+sld.value;v.textContent=rho+' mm';chip.textContent='ρ = '+rho+' mm';});
+  mu.addEventListener('input',()=>{musp=+mu.value/10;muv.textContent=musp.toFixed(1)+' mm⁻¹';});
+  addJob(cv,()=>{
+    const {c,w,h}=fit(cv);
+    c.clearRect(0,0,w,h);
+    const mm2px=w/80;                                 // 80 mm field of view
+    const sx=w/2-rho/2*mm2px, dx=w/2+rho/2*mm2px, sy=h*0.14;
+    const D=1/(3*(mua+musp));
+    const ueff=Math.sqrt(mua/D);
+    const G=(ax,ay,bx,by)=>{const r=Math.max(0.8,Math.hypot(ax-bx,ay-by));return Math.exp(-ueff*r)/r;};
+    const gsd=G(sx/mm2px,sy/mm2px,dx/mm2px,sy/mm2px);
+    const step=Math.max(3,Math.round(w/120));
+    let peak=1e-12; const grid=[];
+    for(let y=sy;y<h;y+=step){
+      const row=[];
+      for(let x=0;x<w;x+=step){
+        const X=x/mm2px, Y=y/mm2px;
+        const val=G(sx/mm2px,sy/mm2px,X,Y)*G(X,Y,dx/mm2px,sy/mm2px)/Math.max(1e-12,gsd);
+        row.push(val); if(val>peak) peak=val;
+      }
+      grid.push(row);
+    }
+    grid.forEach((row,ri)=>{
+      row.forEach((val,ci)=>{
+        const a=Math.pow(clamp(val/peak,0,1),0.42);
+        if(a<0.035) return;
+        c.fillStyle=cmap('inferno',a);
+        c.globalAlpha=0.25+a*0.75;
+        c.fillRect(ci*step,sy+ri*step,step+.6,step+.6);
+      });
+    });
+    c.globalAlpha=1;
+    // tissue surface
+    c.strokeStyle=css('--scr-fg');c.lineWidth=1.2;
+    c.beginPath();c.moveTo(0,sy);c.lineTo(w,sy);c.stroke();
+    // depth ticks
+    c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+    for(let d=10;d<=40;d+=10){
+      const y=sy+d*mm2px; if(y>h-4) break;
+      c.globalAlpha=.4;c.strokeStyle=css('--scr-line');
+      c.beginPath();c.setLineDash([2,4]);c.moveTo(0,y);c.lineTo(w,y);c.stroke();c.setLineDash([]);
+      c.globalAlpha=1;c.fillText(d+'mm',3,y-2);
+    }
+    // optodes
+    [[sx,css('--acc'),'S'],[dx,css('--acc2'),'D']].forEach(([x,col,lb])=>{
+      c.fillStyle=col;c.fillRect(x-4,sy-7,8,7);
+      c.font='500 8px "IBM Plex Mono", monospace';c.fillText(lb,x-2.5,sy-9);
+    });
+    // effective penetration readout
+    c.fillStyle=css('--scr-fg');c.font='500 7.5px "IBM Plex Mono", monospace';
+    c.fillText('δ ≈ '+(1/ueff).toFixed(1)+' mm   peak depth ≈ '+(rho*0.42).toFixed(0)+' mm',4,h-5);
+    cbar(c,'inferno',w-70,14,60,5,'0','1');
+  },12);
+})();
+
+/* ══════════════ PANEL VISUALS ══════════════ */
+(function panels(){
+  const V={};
+
+  V.loss=(c,w,h,t)=>{ // non-convex landscape + multi-start descent (Project-I)
+    const f=(x,y)=>Math.sin(x*2.6)*Math.cos(y*2.2)*0.55+ (x*x+y*y)*0.30 + Math.sin(x*5.4+1.1)*0.11;
+    const st=Math.max(4,Math.round(w/70));
+    let mn=9,mx=-9; const g=[];
+    for(let py=0;py<h;py+=st){const row=[];for(let px=0;px<w;px+=st){
+      const x=(px/w*2-1)*2.1,y=(py/h*2-1)*2.1,v=f(x,y);row.push(v);if(v<mn)mn=v;if(v>mx)mx=v;}g.push(row);}
+    g.forEach((row,ri)=>row.forEach((v,ci)=>{
+      const a=(v-mn)/(mx-mn);
+      c.fillStyle=cmap('plasma',1-a);
+      c.globalAlpha=0.30+(1-a)*0.52;
+      c.fillRect(ci*st,ri*st,st+.6,st+.6);
+    }));
+    c.globalAlpha=1;
+    const K=5;
+    for(let k=0;k<K;k++){
+      const r=mulberry(500+k*13);
+      let x=(r()*2-1)*1.85, y=(r()*2-1)*1.85;
+      const prog=MOTION?(t*0.35+k*0.2)%1:0.85;
+      const n=Math.round(prog*46)+2;
+      c.strokeStyle=css('--scr-fg');c.globalAlpha=.6;c.lineWidth=1;
+      c.beginPath();
+      for(let i=0;i<n;i++){
+        const e=0.0045;
+        const gx=(f(x+e,y)-f(x-e,y))/(2*e), gy=(f(x,y+e)-f(x,y-e))/(2*e);
+        x-=gx*0.055; y-=gy*0.055;
+        const px=(x/2.1*0.5+0.5)*w, py=(y/2.1*0.5+0.5)*h;
+        i?c.lineTo(px,py):c.moveTo(px,py);
+      }
+      c.stroke();
+      c.globalAlpha=1;c.fillStyle=css('--acc');
+      c.beginPath();c.arc((x/2.1*0.5+0.5)*w,(y/2.1*0.5+0.5)*h,2.2,0,TAU);c.fill();
+    }
+  };
+
+  V.xmodal=(c,w,h,t)=>{ // ECG above, reconstructed EEG below
+    const N=160;
+    c.strokeStyle=css('--acc');c.lineWidth=1.2;c.beginPath();
+    for(let i=0;i<N;i++){
+      const u=i/N, p=(u*4+t*0.35)%1;
+      let v=-0.08;
+      v+=Math.exp(-Math.pow((p-0.30)/0.013,2))*1.0;
+      v-=Math.exp(-Math.pow((p-0.26)/0.016,2))*0.22;
+      v-=Math.exp(-Math.pow((p-0.345)/0.018,2))*0.26;
+      v+=Math.exp(-Math.pow((p-0.52)/0.055,2))*0.30;
+      v+=Math.exp(-Math.pow((p-0.13)/0.045,2))*0.17;
+      const x=u*w, y=h*0.27-v*h*0.17;
+      i?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.stroke();
+    c.strokeStyle=css('--acc2');c.lineWidth=1.2;c.beginPath();
+    for(let i=0;i<N;i++){
+      const u=i/N, tt=t*0.9+u*4.6;
+      const v=Math.sin(tt*2.3)*0.5+Math.sin(tt*6.1+1)*0.3+Math.sin(tt*13+2)*0.14;
+      const x=u*w, y=h*0.72-v*h*0.16;
+      i?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.stroke();
+    c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+    c.fillText('ECG',4,12); c.fillText('EEG (recon)',4,h*0.52);
+    c.strokeStyle=css('--scr-line');c.setLineDash([2,3]);
+    c.beginPath();c.moveTo(0,h*0.47);c.lineTo(w,h*0.47);c.stroke();c.setLineDash([]);
+  };
+
+  V.manifold=(c,w,h,t)=>{ // two latent clouds, rotating, partially aligned
+    const r=mulberry(9191); const P=[];
+    for(let i=0;i<96;i++){
+      const a=r()*TAU, rr=Math.sqrt(r());
+      P.push({x:Math.cos(a)*rr,y:Math.sin(a)*rr,z:gauss(r)*0.42});
+    }
+    const th=MOTION?t*0.26:0.6, ct=Math.cos(th), stn=Math.sin(th);
+    const align=0.5+0.5*Math.sin(t*0.4);
+    [[0,css('--acc2'),0],[1,css('--acc'),1]].forEach(([set,col])=>{
+      c.fillStyle=col;
+      P.forEach((p,i)=>{
+        if(i%2!==set) return;
+        let x=p.x,y=p.y,z=p.z;
+        if(set===1){ const sh=0.62*(1-align); x=x*0.92+sh; y=y*1.05-sh*0.5; }
+        const X=x*ct-z*stn, Z=x*stn+z*ct;
+        const s=1/(2.3+Z);
+        const px=w/2+X*w*0.34*s*2.1, py=h/2+y*h*0.33*s*2.1;
+        c.globalAlpha=clamp(0.25+s*0.9,0,.92);
+        c.beginPath();c.arc(px,py,1.6+s*1.4,0,TAU);c.fill();
+      });
+    });
+    c.globalAlpha=1;
+    c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+    c.fillText('wet',4,12); c.fillText('dry',4,22);
+    c.fillStyle=css('--acc2');c.fillRect(22,7,8,2);
+    c.fillStyle=css('--acc');c.fillRect(22,17,8,2);
+  };
+
+  V.seizure=(c,w,h,t)=>{
+    const freqs=10, cols=Math.round(w/6);
+    for(let ci=0;ci<cols;ci++){
+      const burst=Math.max(0,Math.sin((t*0.5+ci*0.055)*TAU*0.4));
+      for(let fi=0;fi<freqs;fi++){
+        const lowf=1-fi/freqs;
+        const a=clamp(lowf*0.55+burst*lowf*0.85+Math.sin(ci*0.7+fi)*0.06,0,1);
+        c.fillStyle=cmap('turbo',a);
+        c.globalAlpha=0.18+a*0.74;
+        c.fillRect(ci*6,h-(fi+1)*(h/freqs),6.5,h/freqs+.6);
+      }
+    }
+    c.globalAlpha=1;
+  };
+
+  V.ecg=(c,w,h,t)=>{
+    const N=200;
+    c.strokeStyle=css('--acc2');c.lineWidth=1.25;c.beginPath();
+    const marks=[];
+    for(let i=0;i<N;i++){
+      const u=i/N, ph=(u*5+t*0.3)%1, beat=Math.floor(u*5+t*0.3);
+      const irregular=(beat%4===3)?0.42:0;
+      let v=0;
+      v+=Math.exp(-Math.pow((ph-0.3-irregular*0.1)/0.012,2))*(1-irregular*0.4);
+      v-=Math.exp(-Math.pow((ph-0.26)/0.015,2))*0.2;
+      v+=Math.exp(-Math.pow((ph-0.5)/0.05,2))*0.28;
+      if(Math.abs(ph-0.3)<0.006) marks.push([u*w,beat%4===3]);
+      const x=u*w, y=h*0.55-v*h*0.34;
+      i?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.stroke();
+    marks.forEach(([x,ab])=>{
+      c.strokeStyle=ab?css('--acc'):css('--scr-fg2');c.lineWidth=1;c.globalAlpha=.75;
+      c.beginPath();c.moveTo(x,4);c.lineTo(x,h-4);c.stroke();c.globalAlpha=1;
+      c.fillStyle=ab?css('--acc'):css('--scr-fg2');
+      c.font='500 7px "IBM Plex Mono", monospace';c.fillText(ab?'V':'N',x+2,11);
+    });
+  };
+
+  V.mri=(c,w,h,t)=>{ // 4-class feature space, poorly separated (the honest point)
+    const r=mulberry(777);
+    const cls=[[0.34,0.40],[0.56,0.46],[0.46,0.62],[0.62,0.66]];
+    const cols=['#FF4A22','#22F0C8','#FFC234','#B07CFF'];
+    cls.forEach((ct,k)=>{
+      c.fillStyle=cols[k];
+      for(let i=0;i<34;i++){
+        const x=(ct[0]+gauss(r)*0.085)*w, y=(ct[1]+gauss(r)*0.085)*h;
+        c.globalAlpha=.52;c.beginPath();c.arc(x,y,1.9,0,TAU);c.fill();
+      }
+    });
+    c.globalAlpha=1;
+    c.strokeStyle=css('--scr-fg2');c.setLineDash([3,3]);c.lineWidth=1;c.globalAlpha=.5;
+    c.beginPath();c.moveTo(w*0.2,h*0.78);c.lineTo(w*0.82,h*0.2);c.stroke();
+    c.setLineDash([]);c.globalAlpha=1;
+    c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+    c.fillText('overlapping classes',4,h-5);
+  };
+
+  V.banana=(c,w,h,t)=>{
+    const musp=1.0,mua=0.01,D=1/(3*(mua+musp)),ue=Math.sqrt(mua/D);
+    const mm=w/70, sy=h*0.16, sx=w*0.3, dx=w*0.7;
+    const G=(ax,ay,bx,by)=>{const r=Math.max(.8,Math.hypot(ax-bx,ay-by));return Math.exp(-ue*r)/r;};
+    const st=Math.max(3,Math.round(w/90));
+    let pk=1e-12;const g=[];
+    for(let y=sy;y<h;y+=st){const row=[];for(let x=0;x<w;x+=st){
+      const v=G(sx/mm,sy/mm,x/mm,y/mm)*G(x/mm,y/mm,dx/mm,sy/mm);row.push(v);if(v>pk)pk=v;}g.push(row);}
+    g.forEach((row,ri)=>row.forEach((v,ci)=>{
+      const a=Math.pow(clamp(v/pk,0,1),.42); if(a<.04)return;
+      c.fillStyle=cmap('inferno',a);
+      c.globalAlpha=0.22+a*.78;c.fillRect(ci*st,sy+ri*st,st+.6,st+.6);
+    }));
+    c.globalAlpha=1;
+    c.strokeStyle=css('--scr-fg');c.lineWidth=1;c.beginPath();c.moveTo(0,sy);c.lineTo(w,sy);c.stroke();
+    c.fillStyle='#FF4A22';c.fillRect(sx-3,sy-6,6,6);
+    c.fillStyle='#22F0C8';c.fillRect(dx-3,sy-6,6,6);
+    cbar(c,'inferno',w-62,h-14,54,4,'low','high');
+  };
+
+  V.fluence=(c,w,h,t)=>{ // elliptical 5-layer cross-section, log fluence
+    const cx=w/2, cy=h/2, A=w*0.40, B=h*0.40;
+    const layers=[1,0.86,0.70,0.50,0.28];
+    const st=Math.max(3,Math.round(w/95));
+    const sxn=-0.98;
+    for(let y=0;y<h;y+=st) for(let x=0;x<w;x+=st){
+      const nx=(x-cx)/A, ny=(y-cy)/B, rr=Math.hypot(nx,ny);
+      if(rr>1) continue;
+      let li=layers.findIndex(l=>rr>l); if(li<0) li=layers.length-1;
+      const mu=0.28+li*0.42;
+      const d=Math.hypot(nx-sxn,ny)*1.0;
+      const v=Math.exp(-mu*d*3.1)/Math.max(.22,d);
+      const a=clamp(Math.log10(1+v*9)/1.0,0,1);
+      c.fillStyle=cmap('magma',a);
+      c.globalAlpha=0.25+a*.75;c.fillRect(x,y,st+.6,st+.6);
+    }
+    c.globalAlpha=1;
+    c.strokeStyle='rgba(255,255,255,.26)';c.lineWidth=1;
+    layers.forEach(l=>{c.globalAlpha=.7;c.beginPath();c.ellipse(cx,cy,A*l,B*l,0,0,TAU);c.stroke();});
+    c.globalAlpha=1;
+    c.fillStyle='#22F0C8';c.beginPath();c.arc(cx+sxn*A,cy,3.4,0,TAU);c.fill();
+    cbar(c,'magma',w-62,h-14,54,4,'−','+');
+  };
+
+  V.fem=(c,w,h,t)=>{ // Q4 mesh, cantilever micromotion, strain colour
+    const NX=16,NY=6, mw=w*0.84, mh=h*0.40, ox=w*0.08, oy=h*0.30;
+    const amp=MOTION?Math.sin(t*1.25)*0.5+0.5:0.7;
+    const pts=[];
+    for(let j=0;j<=NY;j++){const row=[];for(let i=0;i<=NX;i++){
+      const u=i/NX, vv=j/NY-0.5;
+      const defl=Math.pow(u,2)*(3-u)/2*mh*0.55*amp;
+      row.push({x:ox+u*mw, y:oy+vv*mh*0.5+defl, s:Math.abs(vv)*2*(1-u*0.72)*amp});
+    }pts.push(row);}
+    for(let j=0;j<NY;j++)for(let i=0;i<NX;i++){
+      const a=pts[j][i],b=pts[j][i+1],d=pts[j+1][i+1],e=pts[j+1][i];
+      const s=(a.s+b.s+d.s+e.s)/4;
+      c.fillStyle=cmap('viridis',clamp(s,0,1));
+      c.globalAlpha=.42+s*.52;
+      c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.lineTo(d.x,d.y);c.lineTo(e.x,e.y);c.closePath();c.fill();
+      c.globalAlpha=.4;c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=.5;c.stroke();
+    }
+    c.globalAlpha=1;
+    c.fillStyle=css('--scr-fg');c.fillRect(ox-4,oy-mh*0.30,4,mh*0.60);
+    c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+    c.fillText('Q4 · micromotion strain',4,h-5);
+    cbar(c,'viridis',w-62,h-14,54,4,'ε0','εmax');
+  };
+
+  V.arm=(c,w,h,t)=>{ // 2-link planar arm tracking a target
+    const bx=w*0.22, by=h*0.78, L1=w*0.26, L2=w*0.23;
+    const tt=MOTION?t:2.2;
+    const tx=bx+L1*0.9+Math.cos(tt*0.7)*w*0.17, ty=by-h*0.36+Math.sin(tt*0.9)*h*0.14;
+    const dx=tx-bx, dy=ty-by, dd=clamp(Math.hypot(dx,dy),Math.abs(L1-L2)+1,L1+L2-1);
+    const a2=Math.acos(clamp((dd*dd-L1*L1-L2*L2)/(2*L1*L2),-1,1));
+    const a1=Math.atan2(dy,dx)-Math.atan2(L2*Math.sin(a2),L1+L2*Math.cos(a2));
+    const jx=bx+L1*Math.cos(a1), jy=by+L1*Math.sin(a1);
+    const ex=jx+L2*Math.cos(a1+a2), ey=jy+L2*Math.sin(a1+a2);
+    c.strokeStyle=css('--scr-line2');c.lineWidth=1;c.setLineDash([2,4]);
+    c.beginPath();c.arc(bx,by,L1+L2,Math.PI,TAU);c.stroke();c.setLineDash([]);
+    c.strokeStyle=css('--acc2');c.lineWidth=3.2;c.lineCap='round';
+    c.beginPath();c.moveTo(bx,by);c.lineTo(jx,jy);c.stroke();
+    c.strokeStyle=css('--acc');c.beginPath();c.moveTo(jx,jy);c.lineTo(ex,ey);c.stroke();
+    [[bx,by,css('--scr-fg'),4],[jx,jy,css('--scr-fg'),3.4],[ex,ey,css('--acc'),3.4]].forEach(([x,y,col,r])=>{
+      c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,TAU);c.fill();
+    });
+    c.strokeStyle=css('--acc3');c.lineWidth=1;
+    c.beginPath();c.arc(tx,ty,6,0,TAU);c.stroke();
+    c.beginPath();c.moveTo(tx-9,ty);c.lineTo(tx+9,ty);c.moveTo(tx,ty-9);c.lineTo(tx,ty+9);c.stroke();
+    // K/C bars
+    const K=0.5+0.4*Math.sin(tt*0.5), C=0.5+0.4*Math.cos(tt*0.37);
+    c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+    c.fillText('K',w-40,h-16);c.fillText('C',w-40,h-6);
+    c.fillStyle=css('--acc2');c.fillRect(w-30,h-21,K*24,4);
+    c.fillStyle=css('--acc4');c.fillRect(w-30,h-11,C*24,4);
+  };
+
+  V.optical=(c,w,h,t)=>{ // isolated optical link: pulses travelling down fibre
+    const y=h*0.5;
+    c.strokeStyle=css('--scr-line2');c.lineWidth=7;c.globalAlpha=.5;
+    c.beginPath();c.moveTo(w*0.22,y);c.lineTo(w*0.78,y);c.stroke();c.globalAlpha=1;
+    c.strokeStyle=css('--acc3');c.lineWidth=1;c.setLineDash([3,4]);
+    c.beginPath();c.moveTo(w*0.5,6);c.lineTo(w*0.5,h-6);c.stroke();c.setLineDash([]);
+    c.fillStyle=css('--scr-fg2');c.font='500 6.5px "IBM Plex Mono", monospace';
+    c.fillText('ISOLATION',w*0.5-19,11);
+    for(let k=0;k<5;k++){
+      const p=MOTION?((t*0.42+k*0.2)%1):(k*0.2+0.1);
+      const x=w*0.22+p*w*0.56;
+      const a=1-Math.abs(p-0.5)*0.5;
+      c.fillStyle=css('--acc2');c.globalAlpha=a*0.9;
+      c.beginPath();c.arc(x,y,3.4,0,TAU);c.fill();
+      c.globalAlpha=a*0.22;c.beginPath();c.arc(x,y,8,0,TAU);c.fill();
+    }
+    c.globalAlpha=1;
+    c.fillStyle=css('--acc');c.fillRect(w*0.16,y-7,10,14);
+    c.fillStyle=css('--acc2');c.fillRect(w*0.80,y-7,10,14);
+    c.fillStyle=css('--scr-fg2');
+    c.fillText('LED',w*0.145,y+22);c.fillText('BPW34',w*0.755,y+22);
+  };
+
+  V.tremor=(c,w,h,t)=>{
+    const N=170;
+    const burst=MOTION?clamp(Math.sin(t*0.42)*2.1,0,1):0.75;
+    ['--acc2','--acc','--acc4'].forEach((col,ax)=>{
+      c.strokeStyle=css(col);c.lineWidth=1.05;c.globalAlpha=.82;c.beginPath();
+      for(let i=0;i<N;i++){
+        const u=i/N, tt=t*1.1+u*5.2;
+        let v=Math.sin(tt*1.7+ax)*0.12;
+        v+=Math.sin(tt*5.0+ax*2.1)*0.52*burst;   // 4–6 Hz tremor band
+        v+=Math.sin(tt*31+ax)*0.035;
+        const y=h*(0.22+ax*0.28)-v*h*0.12;
+        i?c.lineTo(u*w,y):c.moveTo(u*w,y);
+      }
+      c.stroke();
+    });
+    c.globalAlpha=1;
+    const det=burst>0.4;
+    c.fillStyle=det?css('--acc'):css('--scr-fg2');
+    c.font='500 7px "IBM Plex Mono", monospace';
+    c.fillText(det?'TREMOR 4–6 Hz':'quiescent',4,h-5);
+    c.fillText('ax ay az',w-46,11);
+  };
+
+  V.glucose=(c,w,h,t)=>{ // 30-day retention curve + calibration dots
+    const x0=24,x1=w-8,y0=h-18,y1=12;
+    c.strokeStyle=css('--scr-line');c.lineWidth=1;
+    c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y0);c.moveTo(x0,y0);c.lineTo(x0,y1);c.stroke();
+    c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+    c.fillText('100%',1,y1+6);c.fillText('0d',x0-2,h-6);c.fillText('30d',x1-14,h-6);
+    c.strokeStyle=css('--acc2');c.lineWidth=1.8;c.beginPath();
+    for(let i=0;i<=60;i++){
+      const u=i/60, ret=1-0.02*u;
+      const x=x0+u*(x1-x0), y=y0-(ret)*(y0-y1);
+      i?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.stroke();
+    c.strokeStyle=css('--scr-fg2');c.setLineDash([3,3]);c.lineWidth=1;c.beginPath();
+    for(let i=0;i<=60;i++){
+      const u=i/60, ret=Math.exp(-u*1.65);
+      const x=x0+u*(x1-x0), y=y0-ret*(y0-y1);
+      i?c.lineTo(x,y):c.moveTo(x,y);
+    }
+    c.stroke();c.setLineDash([]);
+    const ph=MOTION?(t*0.3)%1:0.6;
+    c.fillStyle=css('--acc');
+    c.beginPath();c.arc(x0+ph*(x1-x0),y0-(1-0.02*ph)*(y0-y1),3,0,TAU);c.fill();
+    c.fillStyle=css('--acc2');c.fillText('CuO nanozyme',x0+6,y1+8);
+    c.fillStyle=css('--scr-fg2');c.fillText('enzymatic',x0+6,y1+18);
+  };
+
+  V.net=(c,w,h,t)=>{ // small MLP with animated activations
+    const L=[4,6,5,3], gapX=w/(L.length+0.6), nodes=[];
+    L.forEach((n,li)=>{
+      const col=[];
+      for(let i=0;i<n;i++){
+        col.push({x:gapX*(li+0.8), y:h*(i+0.5)/n, a:0});
+      }
+      nodes.push(col);
+    });
+    nodes.forEach((col,li)=>col.forEach((nd,i)=>{
+      nd.a=0.5+0.5*Math.sin(t*2.1+li*1.3+i*0.9);
+    }));
+    for(let li=0;li<nodes.length-1;li++){
+      nodes[li].forEach((a,ai)=>nodes[li+1].forEach((b,bi)=>{
+        const wgt=Math.sin(ai*2.3+bi*1.7+li);
+        c.strokeStyle=wgt>0?css('--acc2'):css('--acc');
+        c.globalAlpha=0.07+Math.abs(wgt)*a.a*0.26;
+        c.lineWidth=0.7;
+        c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();
+      }));
+    }
+    c.globalAlpha=1;
+    nodes.forEach(col=>col.forEach(nd=>{
+      c.fillStyle=css('--scr-fg');c.globalAlpha=0.26+nd.a*0.7;
+      c.beginPath();c.arc(nd.x,nd.y,3.1,0,TAU);c.fill();
+    }));
+    c.globalAlpha=1;
+    c.fillStyle=css('--scr-fg2');c.font='500 7px "IBM Plex Mono", monospace';
+    c.fillText('client-side fwd pass',4,h-5);
+  };
+
+  document.querySelectorAll('canvas[data-vis]').forEach(cv=>{
+    const fn=V[cv.dataset.vis]; if(!fn) return;
+    addJob(cv,(t)=>{
+      const {c,w,h}=fit(cv);
+      c.clearRect(0,0,w,h);
+      fn(c,w,h,t);
+    }, MOTION?20:1);
+  });
+})();
+
 </script>
 </body>
 </html>
